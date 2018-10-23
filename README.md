@@ -24,9 +24,9 @@ The web app uses Jinja and Bootstrap to create dynamic HTML and standard CSS.
 `apology.html`, `index.html`, `layout.html`, `login.html`, `register.html`
 
 ### Not yet implemented:
-Complete index.html
+Complete `index.html`
 
-`history.html`, `monthly.html`, `business.html`, `profile.html`
+`history.html`, `monthly.html`, `business.html`, `profile.html`, `update.html`
 
 ## Controller
 A Python application (application.py) runs a Flask server to handle requests.
