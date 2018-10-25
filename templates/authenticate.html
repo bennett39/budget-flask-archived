@@ -1,0 +1,16 @@
+{% extends "layout.html" %}
+
+{% block title %}
+    Two-Factor
+{% endblock %}
+
+{% block main %}
+    <h1>Personal Capital Just Texted You</h1>
+    <form action="/authenticate">
+        <div class="form-group">
+            <label for="SMS">SMS Code</label>
+            <input autocomplete="off" autofocus class="form-control" id="sms" name="sms" placeholer="SMS code" type="text"/>
+        </div>
+        <button class="btn btn-primary" type="submit">Authenticate</button>
+    </form>
+{% endblock %}

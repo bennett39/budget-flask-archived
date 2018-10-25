@@ -1,7 +1,10 @@
-import os
 import getpass
+import json
+import logging
+import os
 
 from cs50 import SQL
+from datetime import datetime, timedelta
 from flask import Flask, flash, redirect, render_template, request, session
 from flask_session import Session
 from personalcapital import PersonalCapital, RequireTwoFactorException, TwoFactorVerificationModeEnum
@@ -39,11 +42,52 @@ db = SQL("sqlite:///budget.db")
 
 # Configure API
 pc = PersonalCapital()
+pc_email = ""
+pc_password = ""
 
 @app.route("/")
 @login_required
 def index():
     return render_template("index.html")
+
+@app.route("/authenticate", methods=["GET","POST"])
+@login_required
+def authenticate():
+    pass
+
+    # TODO
+
+    # Via POST:
+    if request.method == "POST":
+
+        # Get code and complete login
+        try:
+            pc.two_factor_authenticate(TwoFactorVerificationModeEnum.SMS, request.form.get("sms"))
+            pc.authenticate_password(pc_password)
+        except:
+            return apology("Error executing authentication.", 400)
+
+        # Save response from accounts
+        accounts_response = pc.fetch('/newaccount/getAccounts')
+        accounts = accounts_response.json()['spData']
+
+        # Ensure response from accounts
+        if not accounts_response or not accounts:
+            return apology("No response from Personal Capital for that account.", 400)
+
+        # TODO - Save response from transactions
+
+        # TODO - Ensure response from transactions
+
+        # TODO - Update database tables
+
+        # Redirect to "/"
+        return redirect("/")
+
+    # Via GET, render authenticate.html
+    else:
+        render_template("authenticate.html")
+
 
 @app.route("/login", methods=["GET", "POST"])
 def login():
@@ -142,3 +186,45 @@ def register():
     # User reached route via GET (as by clicking a link or via redirect)
     else:
         return render_template("register.html")
+
+@app.route("/update", methods=["GET", "POST"])
+@login_required
+def update():
+
+    if request.method == "POST":
+
+        if not request.form.get("pc_email"):
+            return apology("Please enter username", 400)
+
+        elif not request.form.get("pc_password"):
+            return apology("Please enter password", 400)
+
+        pc_email = request.form.get("pc_email")
+        pc_password = request.form.get("pc_password")
+
+        try:
+            pc.login(pc_email, pc_password)
+        except RequireTwoFactorException:
+            pc.two_factor_challenge(TwoFactorVerificationModeEnum.SMS)
+            return render_template("authenticate.html")
+        except:
+            return apology("Something went wrong logging in.", 400)
+        else:
+            # Save response from accounts
+            accounts_response = pc.fetch('/newaccount/getAccounts')
+            accounts = accounts_response.json()['spData']
+
+            # Ensure response from accounts
+            if not accounts_response or not accounts:
+                return apology("No response from Personal Capital for that account.", 400)
+
+            # TODO - Save response from transactions
+
+            # TODO - Ensure response from transactions
+
+            # TODO - Update database
+
+            return redirect("/")
+
+    else:
+        return render_template("update.html")

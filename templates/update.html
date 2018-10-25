@@ -1,0 +1,21 @@
+{% extends "layout.html" %}
+
+{% block title %}
+    Home
+{% endblock %}
+
+{% block main %}
+    <h1>Update Data</h1>
+    <p>Please enter your Personal Capital username and password.</p>
+    <form action="/update" method="post">
+        <div class="form-group">
+            <label for="pc_email">Email</label>
+            <input autocomplete="off" autofocus class="form-control" id="pc_email" name="pc_email" placeholer="Email" type="text"/>
+        </div>
+        <div class="form-group">
+            <label for="pc_password">Password</label>
+            <input autocomplete="off" autofocus class="form-control" id="pc_password" name="pc_password" placeholer="Password" type="password"/>
+        </div>
+        <button class="btn btn-primary" type="submit">Log In</button>
+    </form>
+{% endblock %}
