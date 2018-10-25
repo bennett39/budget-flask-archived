@@ -1,3 +1,5 @@
+from personalcapital import PersonalCapital, RequireTwoFactorException, TwoFactorVerificationModeEnum
+
 import getpass
 import json
 import logging
@@ -7,7 +9,6 @@ from cs50 import SQL
 from datetime import datetime, timedelta
 from flask import Flask, flash, redirect, render_template, request, session
 from flask_session import Session
-from personalcapital import PersonalCapital, RequireTwoFactorException, TwoFactorVerificationModeEnum
 from tempfile import mkdtemp
 from werkzeug.exceptions import default_exceptions
 from werkzeug.security import check_password_hash, generate_password_hash
@@ -42,8 +43,9 @@ db = SQL("sqlite:///budget.db")
 
 # Configure API
 pc = PersonalCapital()
-pc_email = ""
-pc_password = ""
+email = ""
+password = ""
+sms = ""
 
 @app.route("/")
 @login_required
@@ -53,40 +55,28 @@ def index():
 @app.route("/authenticate", methods=["GET","POST"])
 @login_required
 def authenticate():
-    pass
 
-    # TODO
+        # Via POST:
+        if request.method == "POST":
 
-    # Via POST:
-    if request.method == "POST":
+            # SMS authentication
+            pc.two_factor_authenticate(TwoFactorVerificationModeEnum.SMS, request.form.get(sms))
+            pc.authenticate_password(password)
 
-        # Get code and complete login
-        try:
-            pc.two_factor_authenticate(TwoFactorVerificationModeEnum.SMS, request.form.get("sms"))
-            pc.authenticate_password(pc_password)
-        except:
-            return apology("Error executing authentication.", 400)
+            # TODO - turn get_data into a function
+            # Get accounts data
+            accounts_response = pc.fetch('/newaccount/getAccounts')
+            accounts = accounts_response.json()
 
-        # Save response from accounts
-        accounts_response = pc.fetch('/newaccount/getAccounts')
-        accounts = accounts_response.json()['spData']
+            # TODO - update database w/ data from accounts & transactions
 
-        # Ensure response from accounts
-        if not accounts_response or not accounts:
-            return apology("No response from Personal Capital for that account.", 400)
+            # Redirect to "/"
+            return render_template("test.html", accounts=accounts)
 
-        # TODO - Save response from transactions
+        # Via GET:
+        else:
+            return render_template("authenticate.html")
 
-        # TODO - Ensure response from transactions
-
-        # TODO - Update database tables
-
-        # Redirect to "/"
-        return redirect("/")
-
-    # Via GET, render authenticate.html
-    else:
-        render_template("authenticate.html")
 
 
 @app.route("/login", methods=["GET", "POST"])
@@ -191,40 +181,58 @@ def register():
 @login_required
 def update():
 
+    # Via post:
     if request.method == "POST":
 
+        # Ensure userentered email
         if not request.form.get("pc_email"):
             return apology("Please enter username", 400)
 
+        # Ensure user entered password
         elif not request.form.get("pc_password"):
             return apology("Please enter password", 400)
 
-        pc_email = request.form.get("pc_email")
-        pc_password = request.form.get("pc_password")
+        # Save email & password
+        email = request.form.get("pc_email")
+        password = request.form.get("pc_password")
 
+        # Try to log in
         try:
-            pc.login(pc_email, pc_password)
+            pc.login(email, password)
+
+        # If 2-factor is required, send sms & redirect
         except RequireTwoFactorException:
             pc.two_factor_challenge(TwoFactorVerificationModeEnum.SMS)
-            return render_template("authenticate.html")
-        except:
-            return apology("Something went wrong logging in.", 400)
+            return redirect("/authenticate")
+
+        # Get data:
         else:
-            # Save response from accounts
+            # TODO - turn get_data into a function
+            # Get accounts data
             accounts_response = pc.fetch('/newaccount/getAccounts')
             accounts = accounts_response.json()['spData']
 
-            # Ensure response from accounts
-            if not accounts_response or not accounts:
-                return apology("No response from Personal Capital for that account.", 400)
+            # Get transaction data
+            now = datetime.now()
+            date_format = '%Y-%m-%d'
+            days = 90
+            start_date = (now - (timedelta(days=days+1))).strftime(date_format)
+            end_date = (now - (timedelta(days=1))).strftime(date_format)
+            transactions_response = pc.fetch('/transaction/getUserTransactions', {
+                'sort_cols': 'transactionTime',
+                'sort_rev': 'true',
+                'page': '0',
+                'rows_per_page': '100',
+                'startDate': start_date,
+                'endDate': end_date,
+                'component': 'DATAGRID'
+            })
 
-            # TODO - Save response from transactions
+            transactions = transactions_response.json()['spData']
 
-            # TODO - Ensure response from transactions
+            # TODO - update database w/ data from accounts & transactions
 
-            # TODO - Update database
-
-            return redirect("/")
+        return redirect("/")
 
     else:
         return render_template("update.html")
