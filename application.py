@@ -52,7 +52,7 @@ def index():
 @app.route("/authenticate", methods=["GET","POST"])
 @login_required
 def authenticate():
-    """Authenticate an SMS 2-factor code"""
+    """Authenticate an SMS 2-factor code & update db"""
     # Via POST:
     if request.method == "POST":
 
@@ -184,6 +184,7 @@ def register():
 @app.route("/update", methods=["GET", "POST"])
 @login_required
 def update():
+    """Update db with data from API"""
 
     # Via post:
     if request.method == "POST":

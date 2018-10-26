@@ -8,7 +8,7 @@ import urllib.parse
 from datetime import datetime, timedelta
 from flask import redirect, render_template, request, session
 from functools import wraps
-from personalcapital import PersonalCapital, RequireTwoFactorException, TwoFactorVerificationModeEnum
+from personalcapital import PersonalCapital
 
 
 def apology(message, code=400):
@@ -16,15 +16,21 @@ def apology(message, code=400):
     return render_template("apology.html", code=code, message=message), code
 
 def get_accounts(pc):
-    """ Fetch accounts data from Personal Capital API """
+    """
+    Fetch accounts data from Personal Capital API
 
+    https://github.com/haochi/personalcapital
+    """
     accounts_response = pc.fetch('/newaccount/getAccounts')
     return accounts_response.json()
 
 
 def get_txs(pc):
-    """ Fetch transaction data from Personal Capital API """
+    """
+    Fetch transaction data from Personal Capital API
 
+    https://github.com/haochi/personalcapital
+    """
     now = datetime.now()
     date_format = '%Y-%m-%d'
     days = 90

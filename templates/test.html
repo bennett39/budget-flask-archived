@@ -6,8 +6,19 @@
 
 {% block main %}
     <h1>Results</h1>
+
     <h2>Accounts</h2>
-    <p>{{ accounts }}</p>
+    <ul>
+    {% for key in accounts %}
+        <li>{{ key }} : {{ accounts[key] }}</li>
+    {% endfor %}
+    </ul>
+
     <h2>Transactions</h2>
-    <p>{{ transactions }}</p>
+    <ul>
+    {% for key in transactions %}
+        <li>{{ key }} : {{ transactions[key] }}</li>
+    {% endfor %}
+    </ul>
+
 {% endblock %}
