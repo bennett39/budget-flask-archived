@@ -14,7 +14,7 @@ from werkzeug.exceptions import default_exceptions
 from werkzeug.security import check_password_hash, generate_password_hash
 
 from helpers import apology, get_accounts, get_txs, login_required, usd
-from database import update_accounts, update_txs, accounts_test, txs_test
+from database import update_accounts, update_txs
 
 # Configure application
 app = Flask(__name__)

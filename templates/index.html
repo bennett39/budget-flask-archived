@@ -1,9 +1,138 @@
 {% extends "layout.html" %}
 
 {% block title %}
-    Home
+    Dashboard
 {% endblock %}
 
 {% block main %}
-    <h1>You made it to to the home page!</h1>
+    <h1>Your Dashboard</h1>
+
+        <h2>Accounts</h2>
+            <h3>Bank</h3>
+                <div class="table-responsive table-hover">
+                    <table class="table">
+                        <thead class="thead-dark">
+                            <tr>
+                                <th>Institution</th>
+                                <th>Account</th>
+                                <th>Balance</th>
+                                <th>Last Updated</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for i in accounts %}
+                                {% if i['acc_group'] == 'BANK' %}
+                                <tr>
+                                    <td>{{ i["name"] }}</td>
+                                    <td>{{ i["symbol"] }}</td>
+                                    <td>{{ i["sum(quantity)"] }}</td>
+                                    <td>{{ i["price"] }}</td>
+                                    <td>{{ i["current"] }}</td>
+                                </tr>
+                                {% endif %}
+                            {% endfor %}
+                            <tr>
+                                <td></td>
+                                <td></td>
+                                <td></td>
+                                <th>Total</th>
+                                <th>{{ total }}</th>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+            <h3>Investment</h3>
+                <div class="table-responsive table-hover">
+                    <table class="table">
+                        <thead class="thead-dark">
+                            <tr>
+                                <th>Institution</th>
+                                <th>Account</th>
+                                <th>Balance</th>
+                                <th>Last Updated</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for i in accounts %}
+                                {% if i['acc_group'] == 'RETIREMENT' or i['acc_group'] == 'INVESTMENT' %}
+                                <tr>
+                                    <td>{{ i["name"] }}</td>
+                                    <td>{{ i["symbol"] }}</td>
+                                    <td>{{ i["sum(quantity)"] }}</td>
+                                    <td>{{ i["price"] }}</td>
+                                    <td>{{ i["current"] }}</td>
+                                </tr>
+                                {% endif %}
+                            {% endfor %}
+                            <tr>
+                                <td></td>
+                                <td></td>
+                                <td></td>
+                                <th>Total</th>
+                                <th>{{ total }}</th>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+            <h3>Credit</h3>
+                <div class="table-responsive table-hover">
+                    <table class="table">
+                        <thead class="thead-dark">
+                            <tr>
+                                <th>Institution</th>
+                                <th>Account</th>
+                                <th>Balance</th>
+                                <th>Last Updated</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for i in accounts %}
+                                {% if i['acc_group'] == 'CREDIT_CARD' %}
+                                <tr>
+                                    <td>{{ i["name"] }}</td>
+                                    <td>{{ i["symbol"] }}</td>
+                                    <td>{{ i["sum(quantity)"] }}</td>
+                                    <td>{{ i["price"] }}</td>
+                                    <td>{{ i["current"] }}</td>
+                                </tr>
+                                {% endif %}
+                            {% endfor %}
+                            <tr>
+                                <td></td>
+                                <td></td>
+                                <td></td>
+                                <th>Total</th>
+                                <th>{{ total }}</th>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+        <h2>Recent Transactions</h2>
+            <div class="table-responsive table-hover">
+                <table class="table">
+                    <thead class="thead-dark">
+                        <tr>
+                            <th>Date</th>
+                            <th>Item</th>
+                            <th>Category</th>
+                            <th>Amount</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for i in transactions %}
+                            <tr>
+                                <td>{{ i["name"] }}</td>
+                                <td>{{ i["symbol"] }}</td>
+                                <td>{{ i["sum(quantity)"] }}</td>
+                                <td>{{ i["price"] }}</td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+
+
 {% endblock %}
