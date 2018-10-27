@@ -15,9 +15,8 @@ budget.db:
     - bal_id    -   -   DATABASE: autoincrement
     - acc_id    -   -   LOOKUP: accounts['spData']['accounts'][INDEX]['accountId'] in accounts
     - balance   -   -   accounts['spData']['accounts'][INDEX]['balance']
-    - time  -   -   -   datetime.utcfromtimestamp(accounts['spData'] \
-                            ['accounts'][INDEX]['lastRefreshed']) \
-                            .strftime('%Y-%m-%d %H:%M:%S')
+    - time  -   -   -   accounts['spData']['accounts'][INDEX]['lastRefreshed']
+                                                            --- ^^^ UNIX Time ---
 
 - categories
     - cat_id    -   -   DATABASE: autoincrement
@@ -40,9 +39,9 @@ budget.db:
     - cat_id    -   -   TODO: USER INPUT - leave empty for now
     - amount    -   -   transactions['spData']['transactions'][INDEX]['amount']
     - is_credit -   -   transactions['spData']['transactions'][INDEX]['isCredit]
-    - time  -   -   -   transactions['spData']['transactions'][INDEX]['transactionDate']
+    - date  -   -   -   transactions['spData']['transactions'][INDEX]['transactionDate']
     - pc_catid  -   -   transactions['spData']['transactions'][INDEX]['categoryId']
-    - pc_cat    -   -   TODO: might be tricky bc there's no documentation for this yet
+    - pc_cat    -   -   TODO: might be tricky bc there's no documentation for this
 
 - users
     - user_id   -   -   DATABASE: autoincrement
