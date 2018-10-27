@@ -14,6 +14,7 @@ from werkzeug.exceptions import default_exceptions
 from werkzeug.security import check_password_hash, generate_password_hash
 
 from helpers import apology, get_accounts, get_txs, login_required, usd
+from database import update_accounts, update_txs, accounts_test, txs_test
 
 # Configure application
 app = Flask(__name__)
@@ -52,9 +53,12 @@ def index():
 @app.route("/authenticate", methods=["GET","POST"])
 @login_required
 def authenticate():
-    """Authenticate an SMS 2-factor code & update db"""
+    """Authenticate an SMS 2-factor code & update database"""
     # Via POST:
     if request.method == "POST":
+
+        if not request.form.get('sms').isdigit():
+            return apology("Please enter valid SMS code")
 
         # SMS authentication
         pc.two_factor_authenticate(TwoFactorVerificationModeEnum.SMS, request.form.get('sms'))
@@ -62,20 +66,21 @@ def authenticate():
 
         # Fetch accounts and transactions
         accounts = get_accounts(pc)
-        transactions = get_txs(pc)
 
         if not accounts or accounts['spHeader']['success'] == False:
             return apology("Error loading accounts", 400)
 
-        elif not transactions or transactions['spHeader']['success'] == False:
+        update_accounts(accounts, db)
+
+        transactions = get_txs(pc)
+
+        if not transactions or transactions['spHeader']['success'] == False:
             return apology("Error loading transactions", 400)
 
-        else:
-            pass
-            # TODO - update database
+        update_txs(transactions, db)
 
         # Redirect to "/"
-        return render_template("test.html", accounts=accounts, transactions=transactions)
+        return redirect("/")
 
     # Via GET:
     else:
@@ -160,13 +165,16 @@ def register():
         hash = generate_password_hash(request.form.get("password"))
 
         # Add username to database
-        result = db.execute("INSERT INTO users (username, pwhash) VALUES(:username, :hash)",
-                            username=request.form.get("username"),
-                            hash=hash)
+        result = db.execute("SELECT * FROM users WHERE username = :username", \
+                          username=request.form.get("username"))
 
-        # Apologize if username already exists
-        if not result:
+        if result:
             return apology("Username already exists", 400)
+
+        if not result:
+            db.execute("INSERT INTO users (username, pwhash) VALUES(:username, :hash) \)",
+                        username=request.form.get("username"),
+                        hash=hash)
 
         # Start session with new user id
         rows = db.execute("SELECT * FROM users WHERE username = :username",
@@ -213,17 +221,18 @@ def update():
         # Fetch accounts and transactions
         else:
             accounts = get_accounts(pc)
-            transactions = get_txs(pc)
 
             if not accounts or accounts['spHeader']['success'] == False:
                 return apology("Error loading accounts", 400)
 
-            elif not transactions or transactions['spHeader']['success'] == False:
+            update_accounts(accounts, db)
+
+            transactions = get_txs(pc)
+
+            if not transactions or transactions['spHeader']['success'] == False:
                 return apology("Error loading transactions", 400)
 
-            else:
-                pass
-                # TODO - update database w/ data from accounts & transactions
+            update_txs(transactions, db)
 
         return redirect("/")
 

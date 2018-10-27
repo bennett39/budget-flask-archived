@@ -7,9 +7,10 @@ budget.db:
     - pc_accountid  -   accounts['spData']['accounts'][INDEX]['accountId']
     - name  -   -   -   accounts['spData']['accounts'][INDEX]['name']
     - nickname  -   -   TODO: USER INPUT - leave empty for now
-    - type  -   -   -   accounts['spData']['accounts'][INDEX]['accountType']
+    - acc_type  -   -   accounts['spData']['accounts'][INDEX]['accountType']
     - institution_id    LOOKUP: accounts['spData']['accounts'][INDEX]['firmName'] in institutions
-    - group -   -   -   accounts['spData']['accounts'][INDEX]['accountTypeGroup']
+    - acc_group -   -   -   accounts['spData']['accounts'][INDEX]['accountTypeGroup']
+    - user_id   -   -   session['user_id']
 
 - balances
     - bal_id    -   -   DATABASE: autoincrement
@@ -33,7 +34,6 @@ budget.db:
 
 - txs
     - tx_id     -   -   DATABASE: autoincrement
-    - user_id   -   -   session['user_id']
     - acc_id    -   -   LOOKUP: transactions['spData']['transactions'][INDEX]['accountId'] in accounts
     - item_id   -   -   LOOKUP: transactions['spData']['transactions'][INDEX]['originalDescription'] in items
     - cat_id    -   -   TODO: USER INPUT - leave empty for now
@@ -42,6 +42,7 @@ budget.db:
     - date  -   -   -   transactions['spData']['transactions'][INDEX]['transactionDate']
     - pc_catid  -   -   transactions['spData']['transactions'][INDEX]['categoryId']
     - pc_cat    -   -   TODO: might be tricky bc there's no documentation for this
+    - pc_txid   -   -   transactions['spData']['transactions'][INDEX]['userTransactionId']
 
 - users
     - user_id   -   -   DATABASE: autoincrement
