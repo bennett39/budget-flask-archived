@@ -13,8 +13,8 @@ from tempfile import mkdtemp
 from werkzeug.exceptions import default_exceptions
 from werkzeug.security import check_password_hash, generate_password_hash
 
-from helpers import apology, get_accounts, get_txs, login_required, usd
-from update import update_accounts, update_txs
+from helpers import apology, login_required, usd
+from update import get_accounts, get_txs, update_accounts, update_txs
 
 # Configure application
 app = Flask(__name__)

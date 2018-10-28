@@ -1,5 +1,46 @@
+from personalcapital import PersonalCapital, RequireTwoFactorException, TwoFactorVerificationModeEnum
+
+import getpass
+import json
+import logging
+import os
+from datetime import datetime, timedelta
+
 from cs50 import SQL
 from flask import redirect, render_template, request, session
+
+def get_accounts(pc):
+    """
+    Fetch accounts data from Personal Capital API
+
+    https://github.com/haochi/personalcapital
+    """
+    accounts_response = pc.fetch('/newaccount/getAccounts')
+    return accounts_response.json()
+
+
+def get_txs(pc):
+    """
+    Fetch transaction data from Personal Capital API
+
+    https://github.com/haochi/personalcapital
+    """
+    now = datetime.now()
+    date_format = '%Y-%m-%d'
+    days = 90
+    start_date = (now - (timedelta(days=days+1))).strftime(date_format)
+    end_date = (now - (timedelta(days=1))).strftime(date_format)
+    transactions_response = pc.fetch('/transaction/getUserTransactions', {
+        'sort_cols': 'transactionTime',
+        'sort_rev': 'true',
+        'page': '0',
+        'rows_per_page': '100',
+        'startDate': start_date,
+        'endDate': end_date,
+        'component': 'DATAGRID'
+    })
+
+    return transactions_response.json()
 
 def update_accounts(accounts, db):
     for i in accounts['spData']['accounts']:
