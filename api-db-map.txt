@@ -9,7 +9,7 @@ budget.db:
     - nickname  -   -   TODO: USER INPUT - leave empty for now
     - acc_type  -   -   accounts['spData']['accounts'][INDEX]['accountType']
     - institution_id    LOOKUP: accounts['spData']['accounts'][INDEX]['firmName'] in institutions
-    - acc_group -   -   -   accounts['spData']['accounts'][INDEX]['accountTypeGroup']
+    - acc_group -   -   accounts['spData']['accounts'][INDEX]['accountTypeGroup']
     - user_id   -   -   session['user_id']
 
 - balances
