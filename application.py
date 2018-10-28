@@ -14,7 +14,7 @@ from werkzeug.exceptions import default_exceptions
 from werkzeug.security import check_password_hash, generate_password_hash
 
 from helpers import apology, get_accounts, get_txs, login_required, usd
-from database import update_accounts, update_txs
+from update import update_accounts, update_txs
 
 # Configure application
 app = Flask(__name__)
@@ -51,6 +51,7 @@ def index():
     """Display the user's accounts and recent transactions"""
 
     # Get accounts from database
+    # Last time account was updated = 'updated'
     accounts = db.execute("SELECT name, acc_type, acc_group, balance, updated, institution \
                             FROM accounts \
                             INNER JOIN ( \
@@ -77,6 +78,7 @@ def index():
 @login_required
 def authenticate():
     """Authenticate an SMS 2-factor code & update database"""
+
     # Via POST:
     if request.method == "POST":
 
@@ -215,7 +217,7 @@ def register():
 @app.route("/update", methods=["GET", "POST"])
 @login_required
 def update():
-    """Update db with data from API"""
+    """Update database with data from API"""
 
     # Via post:
     if request.method == "POST":
