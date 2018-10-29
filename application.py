@@ -72,7 +72,49 @@ def index():
                             ORDER BY institution", \
                             user_id=session['user_id'])
 
-    return render_template("index.html", accounts=accounts)
+    totals = {
+        'bank_total' : 0.00,
+        'retirement_total' : 0.00,
+        'cc_total' : 0.00
+    }
+
+    for i in accounts:
+        bal = float(i['balance'])
+
+        if i['acc_group'] == 'BANK':
+            totals['bank_total'] += bal
+        elif i['acc_group'] == 'RETIREMENT' or i['acc_group'] == 'INVESTMENT':
+            totals['retirement_total'] += bal
+        elif i['acc_group'] == 'CREDIT_CARD':
+            totals['cc_total'] += bal
+
+        i['balance'] = usd(i['balance'])
+        i['updated'] = datetime.utcfromtimestamp(i['updated']/1000).strftime('%Y-%m-%d %H:%M:%S UTC')
+
+    totals['net_worth'] = totals['bank_total'] + totals['retirement_total'] - totals['cc_total']
+
+    for key in totals:
+        totals[key] = usd(totals[key])
+
+    transactions = db.execute("SELECT amount, is_credit, date, item, long_item, name \
+                                FROM txs \
+                                INNER JOIN items \
+                                    ON txs.item_id = items.item_id \
+                                INNER JOIN accounts \
+                                    ON txs.acc_id = accounts.acc_id \
+                                WHERE user_id=:user_id \
+                                ORDER BY date DESC \
+                                LIMIT 30", \
+                                user_id=session['user_id'])
+
+    for i in transactions:
+        if i['is_credit'] == "True":
+            i['amount'] = usd(i['amount'])
+        else:
+            i['amount'] = usd(-1 * i['amount'])
+        i['item'] = (i['item'][:50] + '...') if len(i['item']) > 50 else i['item']
+
+    return render_template("index.html", accounts=accounts, totals=totals, transactions=transactions)
 
 @app.route("/authenticate", methods=["GET","POST"])
 @login_required
