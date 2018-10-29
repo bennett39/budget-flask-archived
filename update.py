@@ -104,16 +104,15 @@ def update_txs(transactions, db):
         if not tx_id:
             acc_id = db.execute("SELECT acc_id FROM accounts WHERE pc_accountid=:pc_accountid", \
                                  pc_accountid=i['accountId'])
-            credit_bool = 0
-            if i['isCredit'] == 'true':
-                credit_bool = 1
+
+            is_credit = str(i['isCredit'])
 
             db.execute("INSERT INTO txs (acc_id, item_id, amount, is_credit, pc_catid, date, pc_txid) \
                         VALUES (:acc_id, :item_id, :amount, :is_credit, :pc_catid, :date, :pc_txid)", \
                         acc_id=acc_id[0]['acc_id'],
                         item_id=item_id[0]['item_id'],
                         amount=i['amount'],
-                        is_credit=credit_bool,
+                        is_credit=is_credit,
                         pc_catid=i['categoryId'],
                         date=i['transactionDate'],
                         pc_txid=i['userTransactionId'])
