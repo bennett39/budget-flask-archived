@@ -7,8 +7,6 @@
 {% block main %}
     <h1>Your Dashboard</h1>
 
-    <p>{{ accounts }}</p>
-
         <h2>Accounts</h2>
             <h3>Bank</h3>
                 <div class="table-responsive table-hover">
@@ -17,8 +15,8 @@
                             <tr>
                                 <th>Institution</th>
                                 <th>Account</th>
-                                <th>Balance</th>
-                                <th>Last Updated</th>
+                                <th class='text-right'>Balance</th>
+                                <th class='text-right'>Last Updated</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -27,16 +25,16 @@
                                 <tr>
                                     <td>{{ i["institution"] }}</td>
                                     <td>{{ i["name"] }}</td>
-                                    <td>{{ i["balance"] }}</td>
-                                    <td>{{ i["updated"] }}</td>
+                                    <td class='text-right'>{{ i["balance"] }}</td>
+                                    <td class='text-right'>{{ i["updated"] }}</td>
                                 </tr>
                                 {% endif %}
                             {% endfor %}
                             <tr>
                                 <td></td>
+                                <th class='text-right'>Total</th>
+                                <th class='text-right'>{{ totals['bank_total'] }}</th>
                                 <td></td>
-                                <th>Total</th>
-                                <th>{{ total }}</th>
                             </tr>
                         </tbody>
                     </table>
@@ -49,8 +47,8 @@
                             <tr>
                                 <th>Institution</th>
                                 <th>Account</th>
-                                <th>Balance</th>
-                                <th>Last Updated</th>
+                                <th class='text-right'>Balance</th>
+                                <th class='text-right'>Last Updated</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -59,17 +57,16 @@
                                 <tr>
                                     <td>{{ i["institution"] }}</td>
                                     <td>{{ i["name"] }}</td>
-                                    <td>{{ i["balance"] }}</td>
-                                    <td>{{ i["updated"] }}</td>
+                                    <td class='text-right'>{{ i["balance"] }}</td>
+                                    <td class='text-right'>{{ i["updated"] }}</td>
                                 </tr>
                                 {% endif %}
                             {% endfor %}
                             <tr>
                                 <td></td>
+                                <th class='text-right'>Total</th>
+                                <th class='text-right'>{{ totals['retirement_total'] }}</th>
                                 <td></td>
-                                <td></td>
-                                <th>Total</th>
-                                <th>{{ total }}</th>
                             </tr>
                         </tbody>
                     </table>
@@ -82,8 +79,8 @@
                             <tr>
                                 <th>Institution</th>
                                 <th>Account</th>
-                                <th>Balance</th>
-                                <th>Last Updated</th>
+                                <th class='text-right'>Balance</th>
+                                <th class='text-right'>Last Updated</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -92,20 +89,38 @@
                                 <tr>
                                     <td>{{ i["institution"] }}</td>
                                     <td>{{ i["name"] }}</td>
-                                    <td>{{ i["balance"] }}</td>
-                                    <td>{{ i["updated"] }}</td>
+                                    <td class='text-right'>{{ i["balance"] }}</td>
+                                    <td class='text-right'>{{ i["updated"] }}</td>
                                 </tr>
                                 {% endif %}
                             {% endfor %}
                             <tr>
                                 <td></td>
+                                <th class='text-right'>Total</th>
+                                <th class='text-right'>{{ totals['cc_total'] }}</th>
                                 <td></td>
-                                <th>Total</th>
-                                <th>{{ total }}</th>
                             </tr>
                         </tbody>
                     </table>
                 </div>
+
+        <h2>Net Worth</h2>
+            <div class="table-responsive table-hover">
+                <table class="table">
+                    <thead class="thead-dark">
+                        <tr>
+                            <th>Account</th>
+                            <th>Balance</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <th>Net Worth</th>
+                            <th>{{ totals['net_worth'] }}</th>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
 
         <h2>Recent Transactions</h2>
             <div class="table-responsive table-hover">
@@ -115,16 +130,16 @@
                             <th>Date</th>
                             <th>Item</th>
                             <th>Category</th>
-                            <th>Amount</th>
+                            <th class='text-right'>Amount</th>
                         </tr>
                     </thead>
                     <tbody>
                         {% for i in transactions %}
                             <tr>
-                                <td>{{ i["name"] }}</td>
-                                <td>{{ i["symbol"] }}</td>
-                                <td>{{ i["sum(quantity)"] }}</td>
-                                <td>{{ i["price"] }}</td>
+                                <td>{{ i["date"] }}</td>
+                                <td>{{ i["item"] }}</td>
+                                <td>{{ i[""] }}</td>
+                                <td class="text-right">{{ i["amount"] }}</td>
                             </tr>
                         {% endfor %}
                     </tbody>
