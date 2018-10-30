@@ -104,12 +104,14 @@ def index():
         totals[key] = usd(totals[key])
 
     # Get transactions from database
-    transactions = db.execute("SELECT amount, is_credit, date, item, long_item, name \
+    transactions = db.execute("SELECT amount, category, is_credit, date, item, name \
                                 FROM txs \
                                 INNER JOIN items \
                                     ON txs.item_id = items.item_id \
                                 INNER JOIN accounts \
                                     ON txs.acc_id = accounts.acc_id \
+                                LEFT JOIN categories \
+                                    ON txs.cat_id = categories.cat_id \
                                 WHERE user_id=:user_id \
                                 ORDER BY date DESC \
                                 LIMIT 30", \
@@ -169,15 +171,22 @@ def business():
     return render_template("history.html")
 
 @app.route("/categorize", methods=["GET", "POST"])
-# @login_required
+@login_required
 def categorize():
     """Allow user to categorize spending"""
 
-    session['user_id'] = 1 # REMOVE!!!
-
-    # Via POST
     if request.method == "POST":
-        pass
+
+        result = request.form.to_dict()
+
+        for key in result:
+            db.execute("UPDATE txs \
+                        SET cat_id=:cat_id \
+                        WHERE tx_id=:tx_id",
+                        cat_id=int(result[key]),
+                        tx_id=int(key))
+
+        return redirect("/")
 
     # Via GET
     else:
@@ -186,12 +195,14 @@ def categorize():
                                  FROM categories")
 
         # Get transactions from database
-        transactions = db.execute("SELECT amount, cat_id, is_credit, date, item, long_item, name \
+        transactions = db.execute("SELECT tx_id, amount, category, is_credit, date, item, name \
                                     FROM txs \
                                     INNER JOIN items \
                                         ON txs.item_id = items.item_id \
                                     INNER JOIN accounts \
                                         ON txs.acc_id = accounts.acc_id \
+                                    LEFT JOIN categories \
+                                        ON txs.cat_id = categories.cat_id \
                                     WHERE user_id=:user_id \
                                     ORDER BY date DESC \
                                     LIMIT 30", \

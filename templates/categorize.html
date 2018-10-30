@@ -6,7 +6,6 @@
 
 {% block main %}
     <h1>Categorize</h1>
-    <p>{{ categories }}</p>
     <form action="/categorize" method="post">
         <div class="form-group">
             <div class="table-responsive table-hover">
@@ -25,20 +24,24 @@
                                 <td>{{ i["date"] }}</td>
                                 <td>{{ i["item"] }}</td>
                                 <td>
-                                    {% if i['cat_id'] is none %}
-                                        <select class="form-control" name="cat_id">
-                                            <option disabled selected value>Category</option>
+                                    <select class="form-control" name="{{ i['tx_id'] }}">
+                                        {% if i['cat_id'] is number and
+                                              i['cat_id'] > 0 and
+                                              i['cat_id'] <= categories[(categories|length - 1)]['cat_id'] %}
                                             {% for j in categories %}
-                                                <option value='{{ j["cat_id"] }}'>{{ j["category"] }}</option>
+                                                {% if j['cat_id'] == i['cat_id'] %}
+                                                    {{ j['category'] }}
+                                                    <option selected value="{{ j['cat_id'] }}">{{ j['category'] }}</option>
+                                                {% endif %}
                                             {% endfor %}
-                                        </select>
-                                    {% else %}
+                                        {% else %}
+                                            <option disabled selected value>Category</option>
+                                        {% endif %}
+
                                         {% for j in categories %}
-                                            {% if j['cat_id'] == i['cat_id'] %}
-                                                {{ j['category'] }}
-                                            {% endif %}
+                                            <option value="{{ j['cat_id'] }}">{{ j['category'] }}</option>
                                         {% endfor %}
-                                    {% endif %}
+                                    </select>
                                 </td>
                                 <td class="text-right">{{ i["amount"] }}</td>
                             </tr>
