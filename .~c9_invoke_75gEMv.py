@@ -13,8 +13,7 @@ from tempfile import mkdtemp
 from werkzeug.exceptions import default_exceptions
 from werkzeug.security import check_password_hash, generate_password_hash
 
-from helpers import apology, login_required, usd
-from update import get_accounts, get_txs, update_accounts, update_txs
+from helpers import apology, get_accounts, get_txs, login_required, usd
 
 # Configure application
 app = Flask(__name__)
@@ -48,84 +47,14 @@ pc = PersonalCapital()
 @app.route("/")
 @login_required
 def index():
-    """Display the user's accounts and recent transactions"""
-
-    # Get accounts from database
-    # Last time account was updated = 'updated'
-    accounts = db.execute("SELECT name, acc_type, acc_group, balance, updated, institution \
-                            FROM accounts \
-                            INNER JOIN ( \
-                                SELECT balances.acc_id, balance, updated \
-                                FROM balances \
-                                INNER JOIN ( \
-                                    SELECT acc_id, max(time) AS updated \
-                                    FROM balances \
-                                    GROUP BY acc_id \
-                                ) AS temp \
-                                ON balances.acc_id = temp.acc_id \
-                                GROUP BY balances.acc_id \
-                            ) AS current \
-                            ON accounts.acc_id = current.acc_id \
-                            INNER JOIN institutions \
-                            ON institutions.institution_id = accounts.institution_id \
-                            WHERE user_id=:user_id \
-                            ORDER BY institution", \
-                            user_id=session['user_id'])
-
-    totals = {
-        'bank_total' : 0.00,
-        'retirement_total' : 0.00,
-        'cc_total' : 0.00
-    }
-
-    for i in accounts:
-        bal = float(i['balance'])
-
-        if i['acc_group'] == 'BANK':
-            totals['bank_total'] += bal
-        elif i['acc_group'] == 'RETIREMENT' or i['acc_group'] == 'INVESTMENT':
-            totals['retirement_total'] += bal
-        elif i['acc_group'] == 'CREDIT_CARD':
-            totals['cc_total'] += bal
-
-        i['balance'] = usd(i['balance'])
-        i['updated'] = datetime.utcfromtimestamp(i['updated']/1000).strftime('%Y-%m-%d %H:%M:%S UTC')
-
-    totals['net_worth'] = totals['bank_total'] + totals['retirement_total'] - totals['cc_total']
-
-    for key in totals:
-        totals[key] = usd(totals[key])
-
-    transactions = db.execute("SELECT amount, is_credit, date, item, long_item, name \
-                                FROM txs \
-                                INNER JOIN items \
-                                    ON txs.item_id = items.item_id \
-                                INNER JOIN accounts \
-                                    ON txs.acc_id = accounts.acc_id \
-                                WHERE user_id=:user_id \
-                                ORDER BY date DESC \
-                                LIMIT 30", \
-                                user_id=session['user_id'])
-
-    for i in transactions:
-        if i['is_credit'] == "True":
-            i['amount'] = usd(i['amount'])
-        else:
-            i['amount'] = usd(-1 * i['amount'])
-        i['item'] = (i['item'][:50] + '...') if len(i['item']) > 50 else i['item']
-
-    return render_template("index.html", accounts=accounts, totals=totals, transactions=transactions)
+    return render_template("index.html")
 
 @app.route("/authenticate", methods=["GET","POST"])
 @login_required
 def authenticate():
-    """Authenticate an SMS 2-factor code & update database"""
-
+    """Authenticate an SMS 2-factor code"""
     # Via POST:
     if request.method == "POST":
-
-        if not request.form.get('sms').isdigit():
-            return apology("Please enter valid SMS code")
 
         # SMS authentication
         pc.two_factor_authenticate(TwoFactorVerificationModeEnum.SMS, request.form.get('sms'))
@@ -133,40 +62,25 @@ def authenticate():
 
         # Fetch accounts and transactions
         accounts = get_accounts(pc)
+        transactions = get_txs(pc)
+
         if not accounts or accounts['spHeader']['success'] == False:
             return apology("Error loading accounts", 400)
-        update_accounts(accounts, db)
 
-        transactions = get_txs(pc)
-        if not transactions or transactions['spHeader']['success'] == False:
+        elif not transactions or transactions['spHeader']['success'] == False:
             return apology("Error loading transactions", 400)
-        update_txs(transactions, db)
 
-        # Let user categorize new transactions
-        return redirect("/categorize")
+        else:
+            pass
+            # TODO - update database
+
+        # Redirect to "/"
+        return render_template("test.html", accounts=accounts, transactions=transactions)
 
     # Via GET:
     else:
         return render_template("authenticate.html")
 
-@app.route("/business")
-@login_required
-def business():
-    """Display business expenses"""
-    return render_template("history.html")
-
-@app.route("/categorize")
-@login_required
-def categorize():
-    """Allow user to categorize spending"""
-
-    return render_template("categorize.html")
-
-@app.route("/history")
-@login_required
-def history():
-    """Display transaction history"""
-    return render_template("history.html")
 
 
 @app.route("/login", methods=["GET", "POST"])
@@ -205,7 +119,6 @@ def login():
     else:
         return render_template("login.html")
 
-
 @app.route("/logout")
 def logout():
     """Log user out"""
@@ -215,13 +128,6 @@ def logout():
 
     # Redirect user to login form
     return redirect("/")
-
-
-@app.route("/monthly")
-@login_required
-def monthly():
-    """Show monthly categorized spending"""
-    return render_template("monthly.html")
 
 
 @app.route("/register", methods=["GET", "POST"])
@@ -254,16 +160,13 @@ def register():
         hash = generate_password_hash(request.form.get("password"))
 
         # Add username to database
-        result = db.execute("SELECT * FROM users WHERE username = :username", \
-                          username=request.form.get("username"))
+        result = db.execute("INSERT INTO users (username, pwhash) VALUES(:username, :hash)",
+                            username=request.form.get("username"),
+                            hash=hash)
 
-        if result:
-            return apology("Username already exists", 400)
-
+        # Apologize if username already exists
         if not result:
-            db.execute("INSERT INTO users (username, pwhash) VALUES(:username, :hash) \)",
-                        username=request.form.get("username"),
-                        hash=hash)
+            return apology("Username already exists", 400)
 
         # Start session with new user id
         rows = db.execute("SELECT * FROM users WHERE username = :username",
@@ -281,7 +184,6 @@ def register():
 @app.route("/update", methods=["GET", "POST"])
 @login_required
 def update():
-    """Update database with data from API"""
 
     # Via post:
     if request.method == "POST":
@@ -310,18 +212,17 @@ def update():
         # Fetch accounts and transactions
         else:
             accounts = get_accounts(pc)
+            transactions = get_txs(pc)
 
             if not accounts or accounts['spHeader']['success'] == False:
                 return apology("Error loading accounts", 400)
 
-            update_accounts(accounts, db)
-
-            transactions = get_txs(pc)
-
-            if not transactions or transactions['spHeader']['success'] == False:
+            elif not transactions or transactions['spHeader']['success'] == False:
                 return apology("Error loading transactions", 400)
 
-            update_txs(transactions, db)
+            else:
+                pass
+                # TODO - update database w/ data from accounts & transactions
 
         return redirect("/")
 

@@ -1,0 +1,51 @@
+# API to Database Map
+
+budget.db:
+
+- accounts
+    - acc_id    -   -   DATABASE: autoincrement
+    - pc_accountid  -   accounts['spData']['accounts'][INDEX]['accountId']
+    - name  -   -   -   accounts['spData']['accounts'][INDEX]['name']
+    - nickname  -   -   TODO: USER INPUT - leave empty for now
+    - acc_type  -   -   accounts['spData']['accounts'][INDEX]['accountType']
+    - institution_id    LOOKUP: accounts['spData']['accounts'][INDEX]['firmName'] in institutions
+    - acc_group -   -   accounts['spData']['accounts'][INDEX]['accountTypeGroup']
+    - user_id   -   -   session['user_id']
+
+- balances
+    - bal_id    -   -   DATABASE: autoincrement
+    - acc_id    -   -   LOOKUP: accounts['spData']['accounts'][INDEX]['accountId'] in accounts
+    - balance   -   -   accounts['spData']['accounts'][INDEX]['balance']
+    - time  -   -   -   accounts['spData']['accounts'][INDEX]['lastRefreshed']
+                                                            --- ^^^ UNIX Time ---
+
+- categories
+    - cat_id    -   -   DATABASE: autoincrement
+    - category  -   -   TODO: USER INPUT - leave empty for now
+
+- institutions
+    - institution_id    DATABASE: autoincrement
+    - institution   -   accounts['spData']['accounts'][INDEX]['firmName']
+
+- items
+    - item_id   -   -   DATABASE: autoincrement
+    - item  -   -   -   transactions['spData']['transactions'][INDEX]['description']
+    - long_item -   -   transactions['spData']['transactions'][INDEX]['originalDescription']
+
+- txs
+    - tx_id     -   -   DATABASE: autoincrement
+    - acc_id    -   -   LOOKUP: transactions['spData']['transactions'][INDEX]['accountId'] in accounts
+    - item_id   -   -   LOOKUP: transactions['spData']['transactions'][INDEX]['originalDescription'] in items
+    - cat_id    -   -   TODO: USER INPUT - leave empty for now
+    - amount    -   -   transactions['spData']['transactions'][INDEX]['amount']
+    - is_credit -   -   transactions['spData']['transactions'][INDEX]['isCredit]
+    - date  -   -   -   transactions['spData']['transactions'][INDEX]['transactionDate']
+    - pc_catid  -   -   transactions['spData']['transactions'][INDEX]['categoryId']
+    - pc_cat    -   -   TODO: might be tricky bc there's no documentation for this
+    - pc_txid   -   -   transactions['spData']['transactions'][INDEX]['userTransactionId']
+
+- users
+    - user_id   -   -   DATABASE: autoincrement
+    - username  -   -   /register
+    - pwhash    -   -   /register
+    - pc_email  -   -   TODO: implement as part of /register
