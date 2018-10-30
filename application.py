@@ -133,26 +133,40 @@ def authenticate():
 
         # Fetch accounts and transactions
         accounts = get_accounts(pc)
-
         if not accounts or accounts['spHeader']['success'] == False:
             return apology("Error loading accounts", 400)
-
         update_accounts(accounts, db)
 
         transactions = get_txs(pc)
-
         if not transactions or transactions['spHeader']['success'] == False:
             return apology("Error loading transactions", 400)
-
         update_txs(transactions, db)
 
-        # Redirect to "/"
-        return redirect("/")
+        # Let user categorize new transactions
+        return redirect("/categorize")
 
     # Via GET:
     else:
         return render_template("authenticate.html")
 
+@app.route("/business")
+@login_required
+def business():
+    """Display business expenses"""
+    return render_template("history.html")
+
+@app.route("/categorize")
+@login_required
+def categorize():
+    """Allow user to categorize spending"""
+
+    return render_template("categorize.html")
+
+@app.route("/history")
+@login_required
+def history():
+    """Display transaction history"""
+    return render_template("history.html")
 
 
 @app.route("/login", methods=["GET", "POST"])
@@ -191,6 +205,7 @@ def login():
     else:
         return render_template("login.html")
 
+
 @app.route("/logout")
 def logout():
     """Log user out"""
@@ -200,6 +215,13 @@ def logout():
 
     # Redirect user to login form
     return redirect("/")
+
+
+@app.route("/monthly")
+@login_required
+def monthly():
+    """Show monthly categorized spending"""
+    return render_template("monthly.html")
 
 
 @app.route("/register", methods=["GET", "POST"])
