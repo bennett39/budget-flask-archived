@@ -7,7 +7,28 @@
 {% block main %}
     <h1>Your Dashboard</h1>
 
+        <h2>Net Worth</h2>
+            <div class="table-responsive table-hover">
+                <table class="table">
+                    <thead class="thead-dark">
+                        <tr>
+                            <th>Account</th>
+                            <th>Balance</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <th>Net Worth</th>
+                            <th>{{ totals['net_worth'] }}</th>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+        <hr>
         <h2>Accounts</h2>
+        <hr>
+
             <h3>Bank</h3>
                 <div class="table-responsive table-hover">
                     <table class="table">
@@ -104,23 +125,6 @@
                     </table>
                 </div>
 
-        <h2>Net Worth</h2>
-            <div class="table-responsive table-hover">
-                <table class="table">
-                    <thead class="thead-dark">
-                        <tr>
-                            <th>Account</th>
-                            <th>Balance</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <tr>
-                            <th>Net Worth</th>
-                            <th>{{ totals['net_worth'] }}</th>
-                        </tr>
-                    </tbody>
-                </table>
-            </div>
 
         <h2>Recent Transactions</h2>
             <div class="table-responsive table-hover">
