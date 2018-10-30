@@ -9,7 +9,7 @@ from datetime import datetime, timedelta
 from cs50 import SQL
 from flask import redirect, render_template, request, session
 
-def get_accounts(pc):
+def api_accounts(pc):
     """
     Fetch accounts data from Personal Capital API
 
@@ -19,7 +19,7 @@ def get_accounts(pc):
     return accounts_response.json()
 
 
-def get_txs(pc):
+def api_txs(pc):
     """
     Fetch transaction data from Personal Capital API
 
@@ -42,7 +42,9 @@ def get_txs(pc):
 
     return transactions_response.json()
 
+
 def update_accounts(accounts, db):
+    """Use API accounts data to update database tables"""
     for i in accounts['spData']['accounts']:
         # Update institutions
         institution_id = db.execute("SELECT institution_id FROM institutions WHERE institution=:institution", \
@@ -84,6 +86,7 @@ def update_accounts(accounts, db):
 
 
 def update_txs(transactions, db):
+    """Use API transaction data to update database tables"""
     for i in transactions['spData']['transactions']:
         # Update items
         item_id = db.execute("SELECT item_id FROM items WHERE item=:item", \

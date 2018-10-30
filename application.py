@@ -14,7 +14,7 @@ from werkzeug.exceptions import default_exceptions
 from werkzeug.security import check_password_hash, generate_password_hash
 
 from helpers import apology, login_required, usd
-from update import get_accounts, get_txs, update_accounts, update_txs
+from update import api_accounts, api_txs, update_accounts, update_txs
 
 # Configure application
 app = Flask(__name__)
@@ -72,12 +72,14 @@ def index():
                             ORDER BY institution", \
                             user_id=session['user_id'])
 
+    # Initialize dictionary of account type sums
     totals = {
         'bank_total' : 0.00,
         'retirement_total' : 0.00,
         'cc_total' : 0.00
     }
 
+    # Update account type sums
     for i in accounts:
         bal = float(i['balance'])
 
@@ -88,14 +90,20 @@ def index():
         elif i['acc_group'] == 'CREDIT_CARD':
             totals['cc_total'] += bal
 
+        # After addition, format as USD strings
         i['balance'] = usd(i['balance'])
+
+        # Time last updated, UNIX to UTC conversion
         i['updated'] = datetime.utcfromtimestamp(i['updated']/1000).strftime('%Y-%m-%d %H:%M:%S UTC')
 
+    # Calculate net worth
     totals['net_worth'] = totals['bank_total'] + totals['retirement_total'] - totals['cc_total']
 
+    # Format as USD string
     for key in totals:
         totals[key] = usd(totals[key])
 
+    # Get transactions from database
     transactions = db.execute("SELECT amount, is_credit, date, item, long_item, name \
                                 FROM txs \
                                 INNER JOIN items \
@@ -107,11 +115,16 @@ def index():
                                 LIMIT 30", \
                                 user_id=session['user_id'])
 
+
     for i in transactions:
+
+        # Create negative numbers
         if i['is_credit'] == "True":
             i['amount'] = usd(i['amount'])
         else:
             i['amount'] = usd(-1 * i['amount'])
+
+        # Truncate description strings
         i['item'] = (i['item'][:50] + '...') if len(i['item']) > 50 else i['item']
 
     return render_template("index.html", accounts=accounts, totals=totals, transactions=transactions)
@@ -132,12 +145,12 @@ def authenticate():
         pc.authenticate_password(session['password'])
 
         # Fetch accounts and transactions
-        accounts = get_accounts(pc)
+        accounts = api_accounts(pc)
         if not accounts or accounts['spHeader']['success'] == False:
             return apology("Error loading accounts", 400)
         update_accounts(accounts, db)
 
-        transactions = get_txs(pc)
+        transactions = api_txs(pc)
         if not transactions or transactions['spHeader']['success'] == False:
             return apology("Error loading transactions", 400)
         update_txs(transactions, db)
@@ -155,12 +168,48 @@ def business():
     """Display business expenses"""
     return render_template("history.html")
 
-@app.route("/categorize")
-@login_required
+@app.route("/categorize", methods=["GET", "POST"])
+# @login_required
 def categorize():
     """Allow user to categorize spending"""
 
-    return render_template("categorize.html")
+    session['user_id'] = 1 # REMOVE!!!
+
+    # Via POST
+    if request.method == "POST":
+        pass
+
+    # Via GET
+    else:
+
+        categories = db.execute("SELECT cat_id, category \
+                                 FROM categories")
+
+        # Get transactions from database
+        transactions = db.execute("SELECT amount, cat_id, is_credit, date, item, long_item, name \
+                                    FROM txs \
+                                    INNER JOIN items \
+                                        ON txs.item_id = items.item_id \
+                                    INNER JOIN accounts \
+                                        ON txs.acc_id = accounts.acc_id \
+                                    WHERE user_id=:user_id \
+                                    ORDER BY date DESC \
+                                    LIMIT 30", \
+                                    user_id=session['user_id'])
+
+
+        for i in transactions:
+
+            # Create negative numbers
+            if i['is_credit'] == "True":
+                i['amount'] = usd(i['amount'])
+            else:
+                i['amount'] = usd(-1 * i['amount'])
+
+            # Truncate description strings
+            i['item'] = (i['item'][:50] + '...') if len(i['item']) > 50 else i['item']
+
+        return render_template("categorize.html", categories=categories, transactions=transactions)
 
 @app.route("/history")
 @login_required
@@ -283,7 +332,7 @@ def register():
 def update():
     """Update database with data from API"""
 
-    # Via post:
+    # Via POST:
     if request.method == "POST":
 
         # Ensure user entered email
@@ -309,21 +358,18 @@ def update():
 
         # Fetch accounts and transactions
         else:
-            accounts = get_accounts(pc)
-
+            accounts = api_accounts(pc)
             if not accounts or accounts['spHeader']['success'] == False:
                 return apology("Error loading accounts", 400)
-
             update_accounts(accounts, db)
 
-            transactions = get_txs(pc)
-
+            transactions = api_txs(pc)
             if not transactions or transactions['spHeader']['success'] == False:
                 return apology("Error loading transactions", 400)
-
             update_txs(transactions, db)
 
         return redirect("/")
 
+    # Via GET:
     else:
         return render_template("update.html")
