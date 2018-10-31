@@ -13,8 +13,8 @@ from tempfile import mkdtemp
 from werkzeug.exceptions import default_exceptions
 from werkzeug.security import check_password_hash, generate_password_hash
 
-from helpers import apology, login_required, usd
-from update import get_accounts, get_txs, update_accounts, update_txs
+from helpers import apology, get_accounts, get_txs, login_required, usd
+from update import api_accounts, api_txs, update_accounts, update_txs
 
 # Configure application
 app = Flask(__name__)
@@ -50,69 +50,18 @@ pc = PersonalCapital()
 def index():
     """Display the user's accounts and recent transactions"""
 
-    # Get accounts from database
-    # Last time account was updated = 'updated'
-    accounts = db.execute("SELECT name, acc_type, acc_group, balance, updated, institution \
-                            FROM accounts \
-                            INNER JOIN ( \
-                                SELECT balances.acc_id, balance, updated \
-                                FROM balances \
-                                INNER JOIN ( \
-                                    SELECT acc_id, max(time) AS updated \
-                                    FROM balances \
-                                    GROUP BY acc_id \
-                                ) AS temp \
-                                ON balances.acc_id = temp.acc_id \
-                                GROUP BY balances.acc_id \
-                            ) AS current \
-                            ON accounts.acc_id = current.acc_id \
-                            INNER JOIN institutions \
-                            ON institutions.institution_id = accounts.institution_id \
-                            WHERE user_id=:user_id \
-                            ORDER BY institution", \
-                            user_id=session['user_id'])
+    # Get accounts and totals from database
+    accounts = get_accounts(db)
+    if not accounts:
+        return apology("Error loading accounts from database", 400)
+    else:
+        totals = accounts[1]
+        accounts = accounts[0]
 
-    totals = {
-        'bank_total' : 0.00,
-        'retirement_total' : 0.00,
-        'cc_total' : 0.00
-    }
-
-    for i in accounts:
-        bal = float(i['balance'])
-
-        if i['acc_group'] == 'BANK':
-            totals['bank_total'] += bal
-        elif i['acc_group'] == 'RETIREMENT' or i['acc_group'] == 'INVESTMENT':
-            totals['retirement_total'] += bal
-        elif i['acc_group'] == 'CREDIT_CARD':
-            totals['cc_total'] += bal
-
-        i['balance'] = usd(i['balance'])
-        i['updated'] = datetime.utcfromtimestamp(i['updated']/1000).strftime('%Y-%m-%d %H:%M:%S UTC')
-
-    totals['net_worth'] = totals['bank_total'] + totals['retirement_total'] - totals['cc_total']
-
-    for key in totals:
-        totals[key] = usd(totals[key])
-
-    transactions = db.execute("SELECT amount, is_credit, date, item, long_item, name \
-                                FROM txs \
-                                INNER JOIN items \
-                                    ON txs.item_id = items.item_id \
-                                INNER JOIN accounts \
-                                    ON txs.acc_id = accounts.acc_id \
-                                WHERE user_id=:user_id \
-                                ORDER BY date DESC \
-                                LIMIT 30", \
-                                user_id=session['user_id'])
-
-    for i in transactions:
-        if i['is_credit'] == "True":
-            i['amount'] = usd(i['amount'])
-        else:
-            i['amount'] = usd(-1 * i['amount'])
-        i['item'] = (i['item'][:50] + '...') if len(i['item']) > 50 else i['item']
+    # Get transactions from database
+    transactions = get_txs(db)
+    if not transactions:
+        return apology("Error loading transactions", 400)
 
     return render_template("index.html", accounts=accounts, totals=totals, transactions=transactions)
 
@@ -132,12 +81,12 @@ def authenticate():
         pc.authenticate_password(session['password'])
 
         # Fetch accounts and transactions
-        accounts = get_accounts(pc)
+        accounts = api_accounts(pc)
         if not accounts or accounts['spHeader']['success'] == False:
             return apology("Error loading accounts", 400)
         update_accounts(accounts, db)
 
-        transactions = get_txs(pc)
+        transactions = api_txs(pc)
         if not transactions or transactions['spHeader']['success'] == False:
             return apology("Error loading transactions", 400)
         update_txs(transactions, db)
@@ -155,12 +104,37 @@ def business():
     """Display business expenses"""
     return render_template("history.html")
 
-@app.route("/categorize")
-@login_required
+@app.route("/categorize", methods=["GET", "POST"])
+# @login_required
 def categorize():
     """Allow user to categorize spending"""
 
-    return render_template("categorize.html")
+    session['user_id'] = 1 # REMOVE!!!
+
+    if request.method == "POST":
+
+        result = request.form.to_dict()
+
+        for key in result:
+            db.execute("UPDATE txs \
+                        SET cat_id=:cat_id \
+                        WHERE tx_id=:tx_id",
+                        cat_id=int(result[key]),
+                        tx_id=int(key))
+
+        return redirect("/")
+
+    # Via GET
+    else:
+        categories = db.execute("SELECT cat_id, category \
+                                 FROM categories")
+
+        # Get transactions from database
+        transactions = get_txs(db)
+        for i in transactions:
+            i['amount'] = usd(i['amount'])
+
+        return render_template("categorize.html", categories=categories, transactions=transactions)
 
 @app.route("/history")
 @login_required
@@ -218,10 +192,58 @@ def logout():
 
 
 @app.route("/monthly")
-@login_required
+# @login_required
 def monthly():
     """Show monthly categorized spending"""
-    return render_template("monthly.html")
+    session['user_id'] = 1 # REMOVE!!!
+
+    # Get txs from database
+    transactions = get_txs(db)
+
+    # Start months dictionary for all data
+    months = {}
+
+    for i in transactions:
+        # date comes in as a string, parse it and then format as year-month
+        i['date'] = datetime.strptime(i['date'], '%Y-%m-%d').strftime('%Y-%m')
+
+        # Handling negative transactions
+        if i['is_credit'] == "True":
+            i['amount'] = i['amount']
+        else:
+            i['amount'] = (-1 * i['amount'])
+
+        # Transaction is start of new month, add month to dictionary as a sub-dictionary
+        if i['date'] not in months:
+            months[i['date']] = {'total': i['amount']}
+        else:
+            months[i['date']]['total'] += i['amount']
+
+        # Transaction is start of new category, add category to that month's sub-dictionary
+        if i['cat_id'] not in months[i['date']]:
+            months[i['date']][i['cat_id']] = i['amount']
+        else:
+            months[i['date']][i['cat_id']] += i['amount']
+
+    # USD formatting
+    for m in months:
+        for cat in months[m]:
+            months[m][cat] = usd(months[m][cat])
+
+    past = list(months.keys())
+    past.reverse()
+
+    categories = db.execute("SELECT cat_id, category \
+                                 FROM categories")
+
+    return render_template("monthly.html", months=months, past=past, categories=categories)
+
+
+@app.route("/profile")
+@login_required
+def profile():
+    """Display user profile - password update and delete account"""
+    return render_template("profile.html")
 
 
 @app.route("/register", methods=["GET", "POST"])
@@ -283,7 +305,7 @@ def register():
 def update():
     """Update database with data from API"""
 
-    # Via post:
+    # Via POST:
     if request.method == "POST":
 
         # Ensure user entered email
@@ -309,21 +331,18 @@ def update():
 
         # Fetch accounts and transactions
         else:
-            accounts = get_accounts(pc)
-
+            accounts = api_accounts(pc)
             if not accounts or accounts['spHeader']['success'] == False:
                 return apology("Error loading accounts", 400)
-
             update_accounts(accounts, db)
 
-            transactions = get_txs(pc)
-
+            transactions = api_txs(pc)
             if not transactions or transactions['spHeader']['success'] == False:
                 return apology("Error loading transactions", 400)
-
             update_txs(transactions, db)
 
-        return redirect("/")
+        return redirect("/categorize")
 
+    # Via GET:
     else:
         return render_template("update.html")
