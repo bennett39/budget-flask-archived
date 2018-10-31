@@ -126,7 +126,6 @@ def categorize():
 
     # Via GET
     else:
-
         categories = db.execute("SELECT cat_id, category \
                                  FROM categories")
 
@@ -231,7 +230,13 @@ def monthly():
         for cat in months[m]:
             months[m][cat] = usd(months[m][cat])
 
-    return render_template("monthly.html", months=months)
+    past = list(months.keys())
+    past.reverse()
+
+    categories = db.execute("SELECT cat_id, category \
+                                 FROM categories")
+
+    return render_template("monthly.html", months=months, past=past, categories=categories)
 
 
 @app.route("/profile")

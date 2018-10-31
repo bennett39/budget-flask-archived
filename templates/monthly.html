@@ -5,9 +5,33 @@
 {% endblock %}
 
 {% block main %}
-    {{ months }}
+    <p>{{ months }}</p>
+    <p>{{ past }}</p>
+    <p>{{ categories }}</p>
 
-
+    <h1>Monthly Spending</h1>
+        <div class="table-responsive table-hover">
+            <table class="table">
+                <thead class="thead-dark">
+                    <tr>
+                        <th></th>
+                        {% for i in past %}
+                            <th>{{ i }}</th>
+                        {% endfor %}
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for j in categories %}
+                    <tr>
+                        <th>{{ j['category'] }}</th>
+                        {% for i in past %}
+                            <td>{{ months[i][j['cat_id']] }}</td>
+                        {% endfor %}
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
 
 
 {% endblock %}
