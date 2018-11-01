@@ -71,7 +71,7 @@ def get_accounts(db):
 def get_txs(db):
     """Get transactions from database"""
     # Get transactions from database
-    transactions = db.execute("SELECT tx_id, amount, txs.cat_id, category, is_credit, date, item, name \
+    transactions = db.execute("SELECT tx_id, amount, txs.cat_id, category, cat_group, is_credit, date, item, name \
                                 FROM txs \
                                 INNER JOIN items \
                                     ON txs.item_id = items.item_id \

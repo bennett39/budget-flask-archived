@@ -98,18 +98,49 @@ def authenticate():
     else:
         return render_template("authenticate.html")
 
+
 @app.route("/business")
-@login_required
+# @login_required
 def business():
     """Display business expenses"""
-    return render_template("history.html")
-
-@app.route("/categorize", methods=["GET", "POST"])
-# @login_required
-def categorize():
-    """Allow user to categorize spending"""
 
     session['user_id'] = 1 # REMOVE!!!
+
+    transactions = get_txs(db)
+    year = datetime.today().year
+    totals = {}
+
+    for i in transactions:
+
+        if i['cat_group'] == 'income' or i['cat_id'] == 13:
+
+            i['date'] = datetime.strptime(i['date'], '%Y-%m-%d').year
+
+            if i['date'] == year:
+                # Handling negative transactions
+                if i['is_credit'] == "True":
+                    i['amount'] = i['amount']
+                else:
+                    i['amount'] = (-1 * i['amount'])
+
+                if i['cat_group'] not in totals:
+                    totals[i['cat_group']] = i['amount']
+                else:
+                    totals[i['cat_group']] += i['amount']
+
+    totals['tax_owed'] = totals['income'] * 0.25
+    totals['tax_paid'] = totals.pop('business')
+
+    for i in totals:
+        totals[i] = usd(totals[i])
+
+    return render_template("business.html", totals=totals)
+
+
+@app.route("/categorize", methods=["GET", "POST"])
+@login_required
+def categorize():
+    """Allow user to categorize spending"""
 
     if request.method == "POST":
 
@@ -192,10 +223,9 @@ def logout():
 
 
 @app.route("/monthly")
-# @login_required
+@login_required
 def monthly():
     """Show monthly categorized spending"""
-    session['user_id'] = 1 # REMOVE!!!
 
     # Get txs from database
     transactions = get_txs(db)
