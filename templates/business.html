@@ -5,5 +5,27 @@
 {% endblock %}
 
 {% block main %}
-
+    <h1>Business</h1>
+    <div class="table-responsive table-hover">
+        <table class="table">
+            <tbody>
+                <tr>
+                    <th>Income YTD</th>
+                    <td>{{ totals['income'] }}</td>
+                </tr>
+                <tr>
+                    <th>Tax Owed YTD</th>
+                    <td>{{ totals['tax_owed'] }}</td>
+                </tr>
+                <tr>
+                    <th>Tax Paid YTD</th>
+                    <td>{{ totals['tax_paid'] }}</td>
+                </tr>
+                <tr>
+                    <th>Tax Outstanding</th>
+                    <td>{{ totals['outstanding'] }}</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
 {% endblock %}
