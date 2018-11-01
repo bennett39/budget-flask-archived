@@ -230,10 +230,12 @@ def monthly():
         for cat in months[m]:
             months[m][cat] = usd(months[m][cat])
 
+    # Reverse order of months - hacky solution, could implement better on months/transactions
     past = list(months.keys())
     past.reverse()
 
-    categories = db.execute("SELECT cat_id, category \
+    # Get categories
+    categories = db.execute("SELECT cat_id, category, cat_group \
                                  FROM categories")
 
     return render_template("monthly.html", months=months, past=past, categories=categories)
