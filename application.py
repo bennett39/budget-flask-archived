@@ -100,11 +100,9 @@ def authenticate():
 
 
 @app.route("/business")
-# @login_required
+@login_required
 def business():
     """Display business expenses"""
-
-    session['user_id'] = 1 # REMOVE!!!
 
     transactions = get_txs(db)
     year = datetime.today().year
@@ -130,6 +128,7 @@ def business():
 
     totals['tax_owed'] = totals['income'] * 0.25
     totals['tax_paid'] = totals.pop('business')
+    totals['outstanding'] = totals['tax_owed'] - totals['tax_paid']
 
     for i in totals:
         totals[i] = usd(totals[i])
@@ -171,6 +170,7 @@ def categorize():
 @login_required
 def history():
     """Display transaction history"""
+
     return render_template("history.html")
 
 
@@ -271,11 +271,51 @@ def monthly():
     return render_template("monthly.html", months=months, past=past, categories=categories)
 
 
-@app.route("/profile")
-@login_required
+@app.route("/profile", methods=['GET', 'POST'])
+#@login_required
 def profile():
     """Display user profile - password update and delete account"""
-    return render_template("profile.html")
+    session['user_id'] = 1 # REMOVE!!
+
+
+    if request.method == 'POST':
+
+        # Check inputs
+        if request.form.get('new') != request.form.get('confirmation'):
+            return apology ("Confirmation doesn't match", 400)
+        elif not request.form.get('current'):
+            return apology("Provide current password", 400)
+        elif not request.form.get('new'):
+            return apology("Provide new password", 400)
+        elif not request.form.get('confirmation'):
+            return apology("Provide confirmation", 400)
+
+        # All inputs are there and new = confirmation
+        else:
+            # Query database for username
+            rows = db.execute("SELECT pwhash FROM users WHERE user_id = :user_id",
+                              user_id=session['user_id'])
+
+            # Ensure user exists and password is correct
+            if len(rows) != 1 or not check_password_hash(rows[0]['pwhash'], request.form.get('current')):
+                return apology("Invalid username and/or password", 403)
+
+            # Update database
+            else:
+                hash = generate_password_hash(request.form.get('new'))
+                db.execute("UPDATE users \
+                            SET pwhash=:hash \
+                            WHERE user_id=:user_id",
+                            user_id=session['user_id'],
+                            hash=hash)
+
+                return redirect("/")
+
+    # Via get
+    else:
+        profile = db.execute("SELECT username FROM users WHERE user_id=:user_id", user_id=session['user_id'])
+
+        return render_template("profile.html", profile=profile)
 
 
 @app.route("/register", methods=["GET", "POST"])
