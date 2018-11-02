@@ -1,4 +1,4 @@
 cs50
 flask
 flask_session
-personalcapital - https://github.com/haochi/personalcapital
+personalcapital
