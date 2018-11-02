@@ -1,0 +1,132 @@
+{% extends "layout.html" %}
+
+{% block title %}
+    Monthly Spending
+{% endblock %}
+
+{% block main %}
+    <h1>Monthly Spending</h1>
+        <div class="table-responsive table-hover">
+            <table class="table table-sm">
+                <thead class="thead-dark">
+                    <tr>
+                        <th></th>
+                        {% for i in past %}
+                            <th>{{ i }}</th>
+                        {% endfor %}
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr class='table-primary'>
+                        <th>Income</th>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                    </tr>
+                    {% for j in categories %}
+                    <tr>
+                        {% if j['cat_group'] == 'income' %}
+                            <td>{{ j['category'] }}</td>
+                            {% for i in past %}
+                                <td>{{ months[i][j['cat_id']] }}</td>
+                            {% endfor %}
+                        {% endif %}
+                    </tr>
+                    {% endfor %}
+
+                    <tr class='table-primary'>
+                        <th>Business Expense</th>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                    </tr>
+                    {% for j in categories %}
+                    <tr>
+                        {% if j['cat_group'] == 'business' %}
+                            <td>{{ j['category'] }}</td>
+                            {% for i in past %}
+                                <td>{{ months[i][j['cat_id']] }}</td>
+                            {% endfor %}
+                        {% endif %}
+                    </tr>
+                    {% endfor %}
+
+                    <tr class='table-primary'>
+                        <th>Fixed Expenses</th>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                    </tr>
+                    {% for j in categories %}
+                    <tr>
+                        {% if j['cat_group'] == 'fixed' %}
+                            <td>{{ j['category'] }}</td>
+                            {% for i in past %}
+                                <td>{{ months[i][j['cat_id']] }}</td>
+                            {% endfor %}
+                        {% endif %}
+                    </tr>
+                    {% endfor %}
+
+                    <tr class='table-primary'>
+                        <th>Discretionary Expenses</th>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                    </tr>
+                    {% for j in categories %}
+                    <tr>
+                        {% if j['cat_group'] == 'discretionary' %}
+                            <td>{{ j['category'] }}</td>
+                            {% for i in past %}
+                                <td>{{ months[i][j['cat_id']] }}</td>
+                            {% endfor %}
+                        {% endif %}
+                    </tr>
+                    {% endfor %}
+
+                    <tr class='table-primary'>
+                        <th>Savings</th>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                    </tr>
+                    {% for j in categories %}
+                    <tr>
+                        {% if j['cat_group'] == 'savings' %}
+                            <td>{{ j['category'] }}</td>
+                            {% for i in past %}
+                                <td>{{ months[i][j['cat_id']] }}</td>
+                            {% endfor %}
+                        {% endif %}
+                    </tr>
+                    {% endfor %}
+
+                    <tr class='table-primary'>
+                        <th>Transfers</th>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                    </tr>
+                    {% for j in categories %}
+                    <tr>
+                        {% if j['cat_group'] == 'transfer' %}
+                            <td>{{ j['category'] }}</td>
+                            {% for i in past %}
+                                <td>{{ months[i][j['cat_id']] }}</td>
+                            {% endfor %}
+                        {% endif %}
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+
+
+{% endblock %}

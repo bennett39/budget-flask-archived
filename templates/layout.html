@@ -29,11 +29,13 @@
             <div class="collapse navbar-collapse" id="navbar">
                 {% if session.user_id %}
                     <ul class="navbar-nav mr-auto mt-2">
-                        <li class="nav-item"><a class="nav-link" href="/history">Quote</a></li>
-                        <li class="nav-item"><a class="nav-link" href="/monthly">Buy</a></li>
-                        <li class="nav-item"><a class="nav-link" href="/business">Sell</a></li>
+                        <li class="nav-item"><a class="nav-link" href="/history">Balance History</a></li>
+                        <li class="nav-item"><a class="nav-link" href="/monthly">Monthly Spending</a></li>
+                        <li class="nav-item"><a class="nav-link" href="/business">Business</a></li>
+                        <li class="nav-item"><a class="nav-link" href="/categorize">Categorize</a></li>
                     </ul>
                     <ul class="navbar-nav ml-auto mt-2">
+                        <li class="nav-item"><a class="nav-link" href="/update">Update Data</a></li>
                         <li class="nav-item"><a class="nav-link" href="/profile">Profile</a></li>
                         <li class="nav-item"><a class="nav-link" href="/logout">Log Out</a></li>
                     </ul>
@@ -59,7 +61,7 @@
         </main>
 
         <footer class="small text-center text-muted">
-            Data provided via the <a href="https://github.com/haochi/personalcapital">open source haochi Personal Cpaital API</a>.
+            Data provided via the <a href="https://github.com/haochi/personalcapital">open source haochi Personal Capital API</a>.
         </footer>
 
     </body>

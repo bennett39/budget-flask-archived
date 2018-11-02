@@ -1,0 +1,56 @@
+{% extends "layout.html" %}
+
+{% block title %}
+    Categorize
+{% endblock %}
+
+{% block main %}
+    <h1>Categorize</h1>
+    <form action="/categorize" method="post">
+        <div class="form-group">
+            <div class="table-responsive table-hover">
+                <table class="table">
+                    <thead class="thead-dark">
+                        <tr>
+                            <th>Date</th>
+                            <th>Item</th>
+                            <th>Category</th>
+                            <th class='text-right'>Amount</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for i in transactions %}
+                            <tr>
+                                <td>{{ i["date"] }}</td>
+                                <td>{{ i["item"] }}</td>
+                                <td>
+                                    <select class="form-control" name="{{ i['tx_id'] }}">
+                                        {% if i['cat_id'] is number and
+                                              i['cat_id'] > 0 and
+                                              i['cat_id'] <= categories[(categories|length - 1)]['cat_id'] %}
+                                            {% for j in categories %}
+                                                {% if j['cat_id'] == i['cat_id'] %}
+                                                    {{ j['category'] }}
+                                                    <option selected value="{{ j['cat_id'] }}">{{ j['category'] }}</option>
+                                                {% endif %}
+                                            {% endfor %}
+                                        {% else %}
+                                            <option disabled selected value>Category</option>
+                                        {% endif %}
+
+                                        {% for j in categories %}
+                                            <option value="{{ j['cat_id'] }}">{{ j['category'] }}</option>
+                                        {% endfor %}
+                                    </select>
+                                </td>
+                                <td class="text-right">{{ i["amount"] }}</td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        <button class="btn btn-primary" type="submit">Categorize</button>
+    </form>
+
+{% endblock %}
