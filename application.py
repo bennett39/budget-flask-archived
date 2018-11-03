@@ -359,7 +359,7 @@ def register():
             return apology("Username already exists", 400)
 
         if not result:
-            db.execute("INSERT INTO users (username, pwhash) VALUES(:username, :hash))",
+            db.execute("INSERT INTO users (username, pwhash) VALUES(:username, :hash)",
                         username=request.form.get("username"),
                         hash=hash)
 
