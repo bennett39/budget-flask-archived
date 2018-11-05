@@ -16,20 +16,13 @@ def get_accounts(db):
     # Last time account was updated = 'updated'
     accounts = db.execute("SELECT name, acc_type, acc_group, balance, updated, institution \
                             FROM accounts \
-                            INNER JOIN ( \
-                                SELECT balances.acc_id, balance, updated \
-                                FROM balances \
-                                INNER JOIN ( \
-                                    SELECT acc_id, max(time) AS updated \
-                                    FROM balances \
-                                    GROUP BY acc_id \
-                                ) AS temp \
-                                ON balances.acc_id = temp.acc_id \
-                                GROUP BY balances.acc_id \
-                            ) AS current \
-                            ON accounts.acc_id = current.acc_id \
+                            INNER JOIN (SELECT acc_id, max(time) AS updated, max(balance) AS balance \
+                                FROM balances  \
+                                GROUP BY acc_id  \
+                                ) AS current \
+                              ON accounts.acc_id = current.acc_id \
                             INNER JOIN institutions \
-                            ON institutions.institution_id = accounts.institution_id \
+                              ON institutions.institution_id = accounts.institution_id \
                             WHERE user_id=:user_id \
                             ORDER BY institution", \
                             user_id=session['user_id'])
