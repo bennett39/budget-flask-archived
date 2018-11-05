@@ -405,6 +405,9 @@ def update():
             pc.two_factor_challenge(TwoFactorVerificationModeEnum.SMS)
             return redirect("/authenticate")
 
+        except:
+            return apology("Sorry there was a problem with your login", 400)
+
         # Fetch accounts and transactions
         else:
             accounts = api_accounts(pc)

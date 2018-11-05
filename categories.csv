@@ -1,0 +1,38 @@
+cat_id,category,cat_group
+1,Job,income
+2,Upwork,income
+3,Independent Contract,income
+4,Book sales,income
+5,Misc Income,income
+6,Email Marketing,business
+7,Hosting & Domain Services,business
+8,Business Development/Advertising,business
+9,Business Travel,business
+10,Hardware/Technology,business
+11,Misc Expenses,business
+12,Reimbursable,business
+13,Taxes,business
+14,Rent,fixed
+15,Renter's Insurance,fixed
+16,Health Insurance,fixed
+17,Healthcare,fixed
+18,Electricity,fixed
+19,Natural Gas,fixed
+20,Internet,fixed
+21,Cell Phone,fixed
+22,Groceries,fixed
+23,Transportation,fixed
+24,Social,discretionary
+25,Restaurants,discretionary
+26,Shopping,discretionary
+27,Apartment Setup,discretionary
+28,Travel,discretionary
+29,Gym,discretionary
+30,Donation,discretionary
+32,Hobbies,discretionary
+33,Applications/Fees,discretionary
+35,Retirement,savings
+36,Student Loan/Tuition,savings
+37,Savings,savings
+38,Credit Card Payment,transfer
+39,Transfer,transfer

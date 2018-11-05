@@ -101,6 +101,7 @@ def update_txs(transactions, db):
                                   item=i['description'])
 
         # Update txs:
+        # TODO: Move this above items and make everything else conditional on the tx not already exisitng
         tx_id = db.execute("SELECT tx_id FROM txs WHERE pc_txid=:pc_txid", \
                             pc_txid=i['userTransactionId'])
 
