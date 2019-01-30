@@ -1,5 +1,6 @@
 test.py
-budget.db
+
+*.db
 db.sqlite3
 
 .python-version
