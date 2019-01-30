@@ -1,2 +1,9 @@
 test.py
 budget.db
+db.sqlite3
+
+.python-version
+*.swp
+*.swo
+
+__pycache__/

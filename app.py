@@ -1,4 +1,5 @@
-from personalcapital import PersonalCapital, RequireTwoFactorException, TwoFactorVerificationModeEnum
+from personalcapital import PersonalCapital, RequireTwoFactorException,\
+                            TwoFactorVerificationModeEnum
 
 import getpass
 import json
