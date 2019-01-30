@@ -1,2 +1,5 @@
 test.py
 budget.db
+
+.python-version
+__pycache__/
