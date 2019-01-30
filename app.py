@@ -127,8 +127,8 @@ def business():
                 else:
                     totals[i['cat_group']] += i['amount']
 
-    totals['tax_owed'] = totals['income'] * 0.25
-    totals['tax_paid'] = totals.pop('business')
+    totals['tax_owed'] = 42 # TODO - totals['income'] * 0.25
+    totals['tax_paid'] = 42 # TODO - totals.pop('business')
     totals['outstanding'] = totals['tax_owed'] - totals['tax_paid']
 
     for i in totals:
