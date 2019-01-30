@@ -1,8 +1,6 @@
-from personalcapital import PersonalCapital, RequireTwoFactorException, TwoFactorVerificationModeEnum
+from personalcapital import PersonalCapital
 
-import getpass
 import json
-import logging
 import os
 from datetime import datetime, timedelta
 
@@ -10,27 +8,23 @@ from cs50 import SQL
 from flask import redirect, render_template, request, session
 
 def api_accounts(pc):
-    """
-    Fetch accounts data from Personal Capital API
+    """ Fetch accounts data from Personal Capital API
+    https://github.com/haochi/personalcapital """
 
-    https://github.com/haochi/personalcapital
-    """
     accounts_response = pc.fetch('/newaccount/getAccounts')
     return accounts_response.json()
 
 
 def api_txs(pc):
-    """
-    Fetch transaction data from Personal Capital API
+    """ Fetch transaction data from Personal Capital API
+    https://github.com/haochi/personalcapital """
 
-    https://github.com/haochi/personalcapital
-    """
     now = datetime.now()
     date_format = '%Y-%m-%d'
     days = 90
     start_date = (now - (timedelta(days=days+1))).strftime(date_format)
     end_date = (now - (timedelta(days=1))).strftime(date_format)
-    transactions_response = pc.fetch('/transaction/getUserTransactions', {
+    payload = {
         'sort_cols': 'transactionTime',
         'sort_rev': 'true',
         'page': '0',
@@ -38,13 +32,15 @@ def api_txs(pc):
         'startDate': start_date,
         'endDate': end_date,
         'component': 'DATAGRID'
-    })
-
+    } 
+    transactions_response = pc.fetch('/transaction/getUserTransactions',
+            payload)
+            
     return transactions_response.json()
 
 
 def update_accounts(accounts, db):
-    """Use API accounts data to update database tables"""
+    """ Use API accounts data to update database tables """
     for i in accounts['spData']['accounts']:
         # Update institutions
         institution_id = db.execute("SELECT institution_id FROM institutions WHERE institution=:institution", \
@@ -86,7 +82,7 @@ def update_accounts(accounts, db):
 
 
 def update_txs(transactions, db):
-    """Use API transaction data to update database tables"""
+    """ Use API transaction data to update database tables """
     for i in transactions['spData']['transactions']:
         # Update items
         item_id = db.execute("SELECT item_id FROM items WHERE item=:item", \
