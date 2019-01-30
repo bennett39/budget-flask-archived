@@ -41,42 +41,54 @@ def update_accounts(accounts, db):
     """ Use API accounts data to update database tables """
     for i in accounts['spData']['accounts']:
         # Update institutions
-        institution_id = db.execute("SELECT institution_id FROM institutions WHERE institution=:institution", \
-                           institution=i['firmName'])
-        if not institution_id:
-            db.execute("INSERT INTO institutions (institution) VALUES(:institution)", \
-                        institution=i['firmName'])
-            institution_id = db.execute("SELECT institution_id FROM institutions WHERE institution=:institution", \
-                                        institution=i['firmName'])
+        institution = i['firmName']
+        institution_response = db.execute("""SELECT institution_id 
+                              FROM institutions
+                              WHERE institution=:institution""",\
+                              institution=institution)
+        if not institution_response:
+            db.execute("""INSERT INTO institutions (institution)
+                              VALUES(:institution)""", \
+                              institution=institution)
+            institution_response = db.execute("""SELECT institution_id 
+                              FROM institutions 
+                              WHERE institution=:institution""",\
+                              institution=institution)
+        institution_id = institution_response[0]['institution_id']
 
         # Update accounts
-        acc_id = db.execute("SELECT acc_id FROM accounts WHERE pc_accountid=:pc_accountid", \
-                             pc_accountid=i['accountId'])
-        if not acc_id:
-            db.execute("INSERT INTO accounts (pc_accountid, name, acc_type, institution_id, acc_group, user_id) \
-                        VALUES(:pc_accountid, :name, :acc_type, :institution_id, :acc_group, :user_id)", \
-                        pc_accountid=i['accountId'],
-                        name=i['name'],
-                        acc_type=i['accountType'],
-                        institution_id=institution_id[0]['institution_id'],
-                        acc_group=i['accountTypeGroup'],
-                        user_id=session['user_id'])
-
-            acc_id = db.execute("SELECT acc_id FROM accounts WHERE pc_accountid=:pc_accountid", \
-                                 pc_accountid=i['accountId'])
+        pc_accountid = i['accountId']
+        account_response = db.execute("""SELECT acc_id FROM accounts 
+                              WHERE pc_accountid=:pc_accountid""",\
+                              pc_accountid=pc_accountid)
+        if not account_response:
+            db.execute("""INSERT INTO accounts (pc_accountid, name, 
+                              acc_type, institution_id, acc_group, user_id)
+                              VALUES(:pc_accountid, :name, :acc_type, 
+                              :institution_id, :acc_group, :user_id)""",\
+                              pc_accountid=pc_accountid,\
+                              name=i['name'],\
+                              acc_type=i['accountType'],\
+                              institution_id=institution_id,\
+                              acc_group=i['accountTypeGroup'],\
+                              user_id=session['user_id'])
+            account_response = db.execute("""SELECT acc_id FROM accounts 
+                              WHERE pc_accountid=:pc_accountid""",\
+                              pc_accountid=i['accountId'])
+        account_id = account_response[0]['acc_id']
 
         # Update balances
-        bal_id = db.execute("SELECT bal_id FROM balances WHERE time=:time AND acc_id=:acc_id", \
-                             time=i['lastRefreshed'],
-                             acc_id=acc_id[0]['acc_id'])
-        if not bal_id:
-            db.execute("INSERT INTO balances (acc_id, balance, time) \
-                        VALUES(:acc_id, :balance, :time)", \
-                        acc_id=acc_id[0]['acc_id'],
-                        balance=i['balance'],
-                        time=i['lastRefreshed'])
-            bal_id = db.execute("SELECT bal_id FROM balances WHERE time=:time", \
-                             time=i['lastRefreshed'])
+        time = i['lastRefreshed']
+        balance_response = db.execute("""SELECT bal_id FROM balances 
+                              WHERE time=:time AND acc_id=:account_id""",\
+                              time=time,\
+                              account_id=account_id)
+        if not balance_response:
+            db.execute("""INSERT INTO balances (acc_id, balance, time) 
+                              VALUES(:account_id, :balance, :time)""",\
+                              account_id=account_id,\
+                              balance=i['balance'],\
+                              time=time)
 
 
 def update_txs(transactions, db):
