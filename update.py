@@ -7,36 +7,34 @@ from datetime import datetime, timedelta
 from cs50 import SQL
 from flask import redirect, render_template, request, session
 
-def api_accounts(pc):
-    """ Fetch accounts data from Personal Capital API
-    https://github.com/haochi/personalcapital """
+def get_pc_data(pc, data_type):
+    payload = create_pc_payload(data_type)
+    if payload:
+        endpoint = '/transaction/getUserTransactions'
+        response = pc.fetch(endpoint, payload)
+    else:
+        endpoint = '/newaccount/getAccounts'
+        response = pc.fetch(endpoint)
+    return response.json()
 
-    accounts_response = pc.fetch('/newaccount/getAccounts')
-    return accounts_response.json()
 
-
-def api_txs(pc):
-    """ Fetch transaction data from Personal Capital API
-    https://github.com/haochi/personalcapital """
-
-    now = datetime.now()
-    date_format = '%Y-%m-%d'
-    days = 90
-    start_date = (now - (timedelta(days=days+1))).strftime(date_format)
-    end_date = (now - (timedelta(days=1))).strftime(date_format)
-    payload = {
-        'sort_cols': 'transactionTime',
-        'sort_rev': 'true',
-        'page': '0',
-        'rows_per_page': '100',
-        'startDate': start_date,
-        'endDate': end_date,
-        'component': 'DATAGRID'
-    } 
-    transactions_response = pc.fetch('/transaction/getUserTransactions',
-            payload)
-            
-    return transactions_response.json()
+def create_pc_payload(data_type):
+    if data_type == 'transactions':
+        now = datetime.now()
+        date_format = '%Y-%m-%d'
+        days = 90
+        start_date = (now - (timedelta(days=days+1))).strftime(date_format)
+        end_date = (now - (timedelta(days=1))).strftime(date_format)
+        return {
+            'sort_cols': 'transactionTime',
+            'sort_rev': 'true',
+            'page': '0',
+            'rows_per_page': '100',
+            'startDate': start_date,
+            'endDate': end_date,
+            'component': 'DATAGRID'
+        }
+    return False
 
 
 def update_accounts(accounts, db):

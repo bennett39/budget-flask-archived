@@ -15,7 +15,7 @@ from werkzeug.exceptions import default_exceptions
 from werkzeug.security import check_password_hash, generate_password_hash
 
 from helpers import apology, get_accounts, get_txs, login_required, usd
-from update import api_accounts, api_txs, update_accounts, update_txs
+from update import get_pc_data, update_accounts, update_txs
 
 # Configure application
 app = Flask(__name__)
@@ -82,12 +82,12 @@ def authenticate():
         pc.authenticate_password(session['password'])
 
         # Fetch accounts and transactions
-        accounts = api_accounts(pc)
+        accounts = get_pc_data(pc, 'accounts')
         if not accounts or accounts['spHeader']['success'] == False:
             return apology("Error loading accounts", 400)
         update_accounts(accounts, db)
 
-        transactions = api_txs(pc)
+        transactions = get_pc_data(pc, 'transactions')
         if not transactions or transactions['spHeader']['success'] == False:
             return apology("Error loading transactions", 400)
         update_txs(transactions, db)
@@ -404,12 +404,12 @@ def update():
 
         # Fetch accounts and transactions
         else:
-            accounts = api_accounts(pc)
+            accounts = get_pc_data(pc, 'accounts')
             if not accounts or accounts['spHeader']['success'] == False:
                 return apology("Error loading accounts", 400)
             update_accounts(accounts, db)
 
-            transactions = api_txs(pc)
+            transactions = get_pc_data(pc, 'transactions')
             if not transactions or transactions['spHeader']['success'] == False:
                 return apology("Error loading transactions", 400)
             update_txs(transactions, db)
