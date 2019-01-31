@@ -107,11 +107,11 @@ def business():
 
     transactions = get_txs(db)
     year = datetime.today().year
-    totals = {}
+    totals = {'Revenue': 0, 'Business': 0}
 
     for i in transactions:
 
-        if i['cat_group'] == 'income' or i['cat_id'] == 13:
+        if i['cat_group'] == 'Revenue' or i['cat_group'] == 'Business':
 
             i['date'] = datetime.strptime(i['date'], '%Y-%m-%d').year
 
@@ -122,19 +122,17 @@ def business():
                 else:
                     i['amount'] = (-1 * i['amount'])
 
-                if i['cat_group'] not in totals:
-                    totals[i['cat_group']] = i['amount']
-                else:
-                    totals[i['cat_group']] += i['amount']
+                totals[i['cat_group']] += i['amount']
 
-    totals['tax_owed'] = 42 # TODO - totals['income'] * 0.25
-    totals['tax_paid'] = 42 # TODO - totals.pop('business')
+    totals['tax_owed'] = totals['Revenue'] * 0.25
+    totals['tax_paid'] = totals['Business']
     totals['outstanding'] = totals['tax_owed'] - totals['tax_paid']
 
     for i in totals:
         totals[i] = usd(totals[i])
 
-    return render_template("business.html", totals=totals)
+    return render_template("business.html", totals=totals,
+            transactions=transactions)
 
 
 @app.route("/categorize", methods=["GET", "POST"])
