@@ -95,31 +95,40 @@ def update_txs(transactions, db):
     """ Use API transaction data to update database tables """
     for i in transactions['spData']['transactions']:
         # Update items
-        item_id = db.execute("SELECT item_id FROM items WHERE item=:item", \
-                              item=i['description'])
+        item = i['description']
+        item_response = db.execute("""SELECT item_id FROM items 
+                              WHERE item=:item""", \
+                              item=item)
 
-        if not item_id:
-            db.execute("INSERT INTO items (item, long_item) \
-                        VALUES (:item, :long_item)", \
-                        item=i['description'],
-                        long_item=i['originalDescription'])
-            item_id = db.execute("SELECT item_id FROM items WHERE item=:item", \
-                                  item=i['description'])
+        if not item_response:
+            db.execute("""INSERT INTO items (item, long_item)
+                                VALUES (:item, :long_item)""", \
+                                item=item, \
+                                long_item=i['originalDescription'])
+            item_response = db.execute("""SELECT item_id FROM items 
+                                WHERE item=:item""", \
+                                item=item)
+        item_id = item_response[0]['item_id']
 
         # Update txs:
-        tx_id = db.execute("SELECT tx_id FROM txs WHERE pc_txid=:pc_txid", \
-                            pc_txid=i['userTransactionId'])
+        transaction_response = db.execute("""SELECT tx_id FROM txs 
+                                WHERE pc_txid=:pc_txid""", \
+                                pc_txid=i['userTransactionId'])
 
-        if not tx_id:
-            acc_id = db.execute("SELECT acc_id FROM accounts WHERE pc_accountid=:pc_accountid", \
-                                 pc_accountid=i['accountId'])
+        if not transaction_response:
+            account_response = db.execute("""SELECT acc_id FROM accounts 
+                                WHERE pc_accountid=:pc_accountid""", \
+                                pc_accountid=i['accountId'])
+            account_id = account_response[0]['acc_id']
 
             is_credit = str(i['isCredit'])
 
-            db.execute("INSERT INTO txs (acc_id, item_id, amount, is_credit, pc_catid, date, pc_txid) \
-                        VALUES (:acc_id, :item_id, :amount, :is_credit, :pc_catid, :date, :pc_txid)", \
-                        acc_id=acc_id[0]['acc_id'],
-                        item_id=item_id[0]['item_id'],
+            db.execute("""INSERT INTO txs (acc_id, item_id, amount, 
+                        is_credit, pc_catid, date, pc_txid)
+                        VALUES (:acc_id, :item_id, :amount, :is_credit, 
+                        :pc_catid, :date, :pc_txid)""", \
+                        acc_id=account_id,
+                        item_id=item_id,
                         amount=i['amount'],
                         is_credit=is_credit,
                         pc_catid=i['categoryId'],
