@@ -1,54 +1,54 @@
 INSERT INTO categories (category, cat_group) 
-    VALUES (Independent Contract, Revenue)
+    VALUES (Independent Contract, Revenue);
 INSERT INTO categories (category, cat_group) 
-    VALUES (Book sales, Revenue)
+    VALUES (Book sales, Revenue);
 INSERT INTO categories (category, cat_group) 
-    VALUES (Miscellaneous, Revenue)
+    VALUES (Miscellaneous, Revenue);
 INSERT INTO categories (category, cat_group) 
-    VALUES (Business Expense, Business)
+    VALUES (Business Expense, Business);
 INSERT INTO categories (category, cat_group) 
-    VALUES (Reimbursable, Business)
+    VALUES (Reimbursable, Business);
 INSERT INTO categories (category, cat_group) 
-    VALUES (Taxes, Business)
+    VALUES (Taxes, Business);
 INSERT INTO categories (category, cat_group) 
-    VALUES (Rent, Fixed)
+    VALUES (Rent, Fixed);
 INSERT INTO categories (category, cat_group) 
-    VALUES (Renter's Insurance, Fixed)
+    VALUES (Renter's Insurance, Fixed);
 INSERT INTO categories (category, cat_group) 
-    VALUES (Health Insurance, Fixed)
+    VALUES (Health Insurance, Fixed);
 INSERT INTO categories (category, cat_group) 
-    VALUES (Healthcare, Fixed)
+    VALUES (Healthcare, Fixed);
 INSERT INTO categories (category, cat_group) 
-    VALUES (Electricity, Fixed)
+    VALUES (Electricity, Fixed);
 INSERT INTO categories (category, cat_group) 
-    VALUES (Natural Gas, Fixed)
+    VALUES (Natural Gas, Fixed);
 INSERT INTO categories (category, cat_group) 
-    VALUES (Internet, Fixed)
+    VALUES (Internet, Fixed);
 INSERT INTO categories (category, cat_group) 
-    VALUES (Cell Phone, Fixed)
+    VALUES (Cell Phone, Fixed);
 INSERT INTO categories (category, cat_group) 
-    VALUES (Groceries, Fixed)
+    VALUES (Groceries, Fixed);
 INSERT INTO categories (category, cat_group) 
-    VALUES (Transportation, Fixed)
+    VALUES (Transportation, Fixed);
 INSERT INTO categories (category, cat_group) 
-    VALUES (Social, Discretionary)
+    VALUES (Social, Discretionary);
 INSERT INTO categories (category, cat_group) 
-    VALUES (Restaurants, Discretionary)
+    VALUES (Restaurants, Discretionary);
 INSERT INTO categories (category, cat_group) 
-    VALUES (Shopping, Discretionary)
+    VALUES (Shopping, Discretionary);
 INSERT INTO categories (category, cat_group) 
-    VALUES (Apartment, Discretionary)
+    VALUES (Apartment, Discretionary);
 INSERT INTO categories (category, cat_group) 
-    VALUES (Travel, Discretionary)
+    VALUES (Travel, Discretionary);
 INSERT INTO categories (category, cat_group) 
-    VALUES (Gym, Discretionary)
+    VALUES (Gym, Discretionary);
 INSERT INTO categories (category, cat_group) 
-    VALUES (Donation, Discretionary)
+    VALUES (Donation, Discretionary);
 INSERT INTO categories (category, cat_group) 
-    VALUES (Education, Discretionary)
+    VALUES (Education, Discretionary);
 INSERT INTO categories (category, cat_group) 
-    VALUES (Hobbies, Discretionary)
+    VALUES (Hobbies, Discretionary);
 INSERT INTO categories (category, cat_group) 
-    VALUES (Fees, Discretionary)
+    VALUES (Fees, Discretionary);
 INSERT INTO categories (category, cat_group) 
-    VALUES (Retirement, Retirement)
+    VALUES (Retirement, Retirement);
