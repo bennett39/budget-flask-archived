@@ -1,4 +1,18 @@
 import sqlalchemy
+#  import urllib import parse
+#  import psycopg2
+
+#  def Postgres():
+    #  parse.uses_netloc.append("postgres")
+    #  url = urlparse.urlparse(os.environ["DATABASE_URL"])
+    #  return psycopg2.connect(
+        #  database=url.path[1:],
+        #  user=url.username,
+        #  password=url.password,
+        #  host=url.hostname,
+        #  port=url.port
+    #  )
+
 
 class SQL(object):
     def __init__(self, url):

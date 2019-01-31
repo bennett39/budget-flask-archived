@@ -5,6 +5,7 @@ import getpass
 import json
 import logging
 import os
+import psycopg2
 
 from engine import SQL
 from datetime import datetime, timedelta
@@ -42,7 +43,10 @@ app.config["SESSION_PERMANENT"] = False
 app.config["SESSION_TYPE"] = "filesystem"
 Session(app)
 
-load_dotenv()
+if os.path.exists(".env"):
+    load_dotenv()
+#  else:
+    #  conn = Postgres()
 
 # Configure CS50 Library to use SQLite database
 db = SQL(os.getenv("DATABASE_URL"))

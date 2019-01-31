@@ -12,6 +12,7 @@ itsdangerous==1.1.0
 Jinja2==2.10
 MarkupSafe==1.1.0
 personalcapital==1.0.1
+psycopg2==2.7.7
 python-dotenv==0.10.1
 requests==2.21.0
 SQLAlchemy==1.2.17
