@@ -26,7 +26,7 @@
                     </tr>
                     {% for j in categories %}
                     <tr>
-                        {% if j['cat_group'] == 'income' %}
+                        {% if j['cat_group'] == 'Revenue' %}
                             <td>{{ j['category'] }}</td>
                             {% for i in past %}
                                 <td>{{ months[i][j['cat_id']] }}</td>
@@ -44,7 +44,7 @@
                     </tr>
                     {% for j in categories %}
                     <tr>
-                        {% if j['cat_group'] == 'business' %}
+                        {% if j['cat_group'] == 'Business' %}
                             <td>{{ j['category'] }}</td>
                             {% for i in past %}
                                 <td>{{ months[i][j['cat_id']] }}</td>
@@ -62,7 +62,7 @@
                     </tr>
                     {% for j in categories %}
                     <tr>
-                        {% if j['cat_group'] == 'fixed' %}
+                        {% if j['cat_group'] == 'Fixed' %}
                             <td>{{ j['category'] }}</td>
                             {% for i in past %}
                                 <td>{{ months[i][j['cat_id']] }}</td>
@@ -80,7 +80,7 @@
                     </tr>
                     {% for j in categories %}
                     <tr>
-                        {% if j['cat_group'] == 'discretionary' %}
+                        {% if j['cat_group'] == 'Discretionary' %}
                             <td>{{ j['category'] }}</td>
                             {% for i in past %}
                                 <td>{{ months[i][j['cat_id']] }}</td>
@@ -98,7 +98,7 @@
                     </tr>
                     {% for j in categories %}
                     <tr>
-                        {% if j['cat_group'] == 'savings' %}
+                        {% if j['cat_group'] == 'Retirement' %}
                             <td>{{ j['category'] }}</td>
                             {% for i in past %}
                                 <td>{{ months[i][j['cat_id']] }}</td>
@@ -116,7 +116,7 @@
                     </tr>
                     {% for j in categories %}
                     <tr>
-                        {% if j['cat_group'] == 'transfer' %}
+                        {% if j['cat_group'] == 'Transfer' %}
                             <td>{{ j['category'] }}</td>
                             {% for i in past %}
                                 <td>{{ months[i][j['cat_id']] }}</td>
