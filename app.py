@@ -6,9 +6,11 @@ import json
 import logging
 import os
 
-from cs50 import SQL
+from engine import SQL
 from datetime import datetime, timedelta
+from dotenv import load_dotenv
 from flask import Flask, flash, redirect, render_template, request, session
+from flask_heroku import Heroku
 from flask_session import Session
 from tempfile import mkdtemp
 from werkzeug.exceptions import default_exceptions
@@ -40,8 +42,10 @@ app.config["SESSION_PERMANENT"] = False
 app.config["SESSION_TYPE"] = "filesystem"
 Session(app)
 
+load_dotenv()
+
 # Configure CS50 Library to use SQLite database
-db = SQL("sqlite:///budget.db")
+db = SQL(os.getenv("DATABASE_URL"))
 
 # Configure API
 pc = PersonalCapital()
