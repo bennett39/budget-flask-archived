@@ -60,19 +60,19 @@ def index():
     """Display the user's accounts and recent transactions"""
 
     # Get accounts and totals from database
-    accounts = get_accounts(db)
-    if not accounts:
-        return apology("Error loading accounts from database", 400)
-    else:
-        totals = accounts[1]
-        accounts = accounts[0]
+    #  accounts = get_accounts(db)
+    #  if not accounts:
+        #  return apology("Error loading accounts from database", 400)
+    #  else:
+        #  totals = accounts[1]
+        #  accounts = accounts[0]
 
-    # Get transactions from database
-    transactions = get_txs(db)
-    if not transactions:
-        return apology("Error loading transactions", 400)
+    #  # Get transactions from database
+    #  transactions = get_txs(db)
+    #  if not transactions:
+        #  return apology("Error loading transactions", 400)
 
-    return render_template("index.html", accounts=accounts, totals=totals, transactions=transactions)
+    return render_template("index.html") #, accounts=accounts, totals=totals, transactions=transactions)
 
 @app.route("/authenticate", methods=["GET","POST"])
 @login_required
