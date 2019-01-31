@@ -1,8 +1,4 @@
-import sqlite3
 from categories import categories
-
-conn = sqlite3.connect('budget.db')
-c = conn.cursor()
 
 def create_accounts(c):
     c.execute("""CREATE TABLE accounts (acc_id 
@@ -14,7 +10,7 @@ def create_accounts(c):
 def create_balances(c):
     c.execute("""CREATE TABLE balances (bal_id 
     SERIAL, acc_id INTEGER, balance NUMERIC, time
-    DATETIME)""")
+    )""")
 
 
 def create_categories(c):
@@ -23,8 +19,8 @@ def create_categories(c):
 
 
 def create_institutions(c):
-    c.execute("""CREATE TABLE institutions (institution_id INTEGER
-    PRIMARY KEY SERIAL, institution TEXT)""")
+    c.execute("""CREATE TABLE institutions (institution_id 
+    SERIAL, institution TEXT)""")
 
 
 def create_items(c):

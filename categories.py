@@ -1,4 +1,4 @@
-categories_text = [
+categories = [
 ["Independent Contract","Revenue"],
 ["Book sales","Revenue"],
 ["Miscellaneous","Revenue"],
