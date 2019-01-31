@@ -5,43 +5,43 @@ conn = sqlite3.connect('budget.db')
 c = conn.cursor()
 
 def create_accounts(c):
-    c.execute("""CREATE TABLE accounts (acc_id INTEGER PRIMARY KEY
-    SERIAL NOT NULL, pc_accountid TEXT, name TEXT, nickname
+    c.execute("""CREATE TABLE accounts (acc_id 
+    SERIAL, pc_accountid TEXT, name TEXT, nickname
     TEXT,acc_type TEXT, institution_id INTEGER,acc_group TEXT,
     user_id INTEGER)""")
 
 
 def create_balances(c):
-    c.execute("""CREATE TABLE balances (bal_id INTEGER PRIMARY KEY
-    SERIAL NOT NULL, acc_id INTEGER, balance NUMERIC, time
+    c.execute("""CREATE TABLE balances (bal_id 
+    SERIAL, acc_id INTEGER, balance NUMERIC, time
     DATETIME)""")
 
 
 def create_categories(c):
-    c.execute("""CREATE TABLE categories (cat_id INTEGER PRIMARY KEY
-    SERIAL NOT NULL, category TEXT, cat_group TEXT)""")
+    c.execute("""CREATE TABLE categories (cat_id 
+    SERIAL, category TEXT, cat_group TEXT)""")
 
 
 def create_institutions(c):
     c.execute("""CREATE TABLE institutions (institution_id INTEGER
-    PRIMARY KEY SERIAL NOT NULL, institution TEXT)""")
+    PRIMARY KEY SERIAL, institution TEXT)""")
 
 
 def create_items(c):
-    c.execute("""CREATE TABLE items (item_id INTEGER PRIMARY KEY
-    SERIAL NOT NULL, item TEXT, long_item TEXT)""")
+    c.execute("""CREATE TABLE items (item_id 
+    SERIAL, item TEXT, long_item TEXT)""")
 
 
 def create_txs(c):
-    c.execute("""CREATE TABLE txs (tx_id INTEGER PRIMARY KEY
-    SERIAL NOT NULL, acc_id INTEGER, item_id INTEGER,
+    c.execute("""CREATE TABLE txs (tx_id 
+    SERIAL, acc_id INTEGER, item_id INTEGER,
     cat_id INTEGER, amount NUMERIC,is_credit TEXT, pc_catid
     INTEGER, pc_cat INTEGER,date TEXT,pc_txid NUMERIC)""")
 
 
 def create_users(c):
-    c.execute("""CREATE TABLE users (user_id INTEGER PRIMARY KEY
-    SERIAL NOT NULL, username TEXT NOT NULL, pwhash TEXT NOT
+    c.execute("""CREATE TABLE users (user_id 
+    SERIAL, username TEXT NOT NULL, pwhash TEXT NOT
     NULL, pc_email TEXT)""")
 
 
